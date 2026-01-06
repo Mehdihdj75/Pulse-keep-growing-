@@ -1,3 +1,4 @@
+import { DiagnosticReport } from '../types';
 
 /**
  * Service de communication avec n8n pour l'automatisation des diagnostics Pulse.
@@ -43,8 +44,9 @@ export const buildN8NPayload = (respondant: string, email: string, answers: Answ
 /**
  * Envoie les données au webhook n8n via une requête POST JSON.
  * Gère les erreurs de réponse et loggue l'activité.
+ * Retourne le rapport de diagnostic généré par n8n.
  */
-export const sendToN8N = async (items: N8NSubmissionItem[]) => {
+export const sendToN8N = async (items: N8NSubmissionItem[]): Promise<DiagnosticReport> => {
   console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses...`, items);
 
   try {
@@ -61,9 +63,19 @@ export const sendToN8N = async (items: N8NSubmissionItem[]) => {
       throw new Error(`Erreur HTTP n8n : ${response.status} - ${errorText || response.statusText}`);
     }
 
-    const data = await response.json().catch(() => ({})); // Handle cases where no JSON is returned gracefully
-    console.log(`[Pulse n8n Connector] Succès : Données transmises au webhook.`);
-    return data;
+    const data = await response.json();
+    console.log(`[Pulse n8n Connector] Succès : Données transmises et rapport reçu.`, data);
+
+    // Normalize n8n response which might be [{ json: { ... } }] or { json: { ... } } or directly { ... }
+    let report = data;
+    if (Array.isArray(data) && data.length > 0) {
+      report = data[0];
+    }
+    if (report && report.json) {
+      report = report.json;
+    }
+
+    return report as DiagnosticReport;
   } catch (error) {
     console.error(`[Pulse n8n Connector] Échec de l'envoi :`, error);
     throw error;

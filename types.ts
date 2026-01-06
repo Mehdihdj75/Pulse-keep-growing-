@@ -90,3 +90,62 @@ export interface AccountManager {
   lastActivity: string;
   avatar: string;
 }
+
+// --- Types for n8n Diagnostic Report ---
+
+export interface DiagnosticMeta {
+  user_id: string;
+  prenom: string;
+  nom: string;
+  role: string;
+}
+
+export interface SectionScore {
+  id: string;
+  nom: string;
+  score: number;
+  score_pct: number;
+  niveau: string;
+  color: string;
+}
+
+export interface DiagnosticScores {
+  global_score: number;
+  global_score_pct: number;
+  global_niveau: string;
+  global_color: string;
+  sections: SectionScore[];
+}
+
+export interface DiagnosticSynthesis {
+  resume_global: string;
+  forces_principales: string;
+  axes_de_vigilance: string;
+}
+
+export interface ThemeDetail {
+  titre: string;
+  texte: string;
+}
+
+export interface SectionAnalysis {
+  section_id: string;
+  section_nom: string;
+  themes: ThemeDetail[];
+}
+
+export interface ActionPlanItem {
+  priorite: number;
+  titre: string;
+  description: string;
+  horizon: string;
+}
+
+export interface DiagnosticReport {
+  meta: DiagnosticMeta;
+  scores: DiagnosticScores;
+  synthese: DiagnosticSynthesis;
+  analyse_detaillee_par_sections: SectionAnalysis[];
+  recommandations_et_plan_action: ActionPlanItem[];
+  conclusion: string;
+}

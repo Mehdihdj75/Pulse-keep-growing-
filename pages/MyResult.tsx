@@ -2,69 +2,10 @@ import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Download, AlertTriangle, LayoutDashboard } from 'lucide-react';
 
-// --- Types ---
-
-interface ReportMeta {
-    user_id?: string;
-    prenom?: string;
-    nom?: string;
-    role?: string;
-}
-
-interface SectionScore {
-    id: string;
-    nom: string;
-    score: number;
-    score_pct: number;
-    niveau: string;
-    color?: string;
-}
-
-interface GlobalScores {
-    global_score: number;
-    global_score_pct: number;
-    global_niveau: string;
-    global_color?: string;
-    sections: SectionScore[];
-}
-
-interface Synthese {
-    resume_global?: string;
-    forces_principales?: string;
-    axes_de_vigilance?: string;
-}
-
-interface Theme {
-    code?: string;
-    titre: string;
-    texte: string;
-}
-
-interface SectionAnalysis {
-    section_id: string;
-    section_nom: string;
-    themes: Theme[];
-}
-
-interface Recommendation {
-    priorite: number;
-    titre: string;
-    description: string;
-    horizon: string;
-}
-
-interface ReportData {
-    meta?: ReportMeta;
-    scores?: GlobalScores;
-    synthese?: Synthese;
-    analyse_detaillee_par_sections?: SectionAnalysis[];
-    recommandations_et_plan_action?: Recommendation[];
-    conclusion?: string;
-    html?: string; // au cas où
-}
+import { DiagnosticReport, DiagnosticMeta, DiagnosticScores, DiagnosticSynthesis, SectionAnalysis, ActionPlanItem, SectionScore } from '../types';
 
 // --- MOCK DATA FOR DEV/FALLBACK ---
-const MOCK_REPORT_DATA: ReportData = {
+const MOCK_REPORT_DATA: DiagnosticReport = {
     meta: {
         prenom: "Utilisateur",
         nom: "Démo",
@@ -116,7 +57,7 @@ const MOCK_REPORT_DATA: ReportData = {
 
 // --- COMPONENTS ---
 
-const HeaderCard: React.FC<{ meta: ReportMeta, scores: GlobalScores }> = ({ meta, scores }) => (
+const HeaderCard: React.FC<{ meta: DiagnosticMeta, scores: DiagnosticScores }> = ({ meta, scores }) => (
     <div className="bg-gradient-to-br from-[#e0f4f3] via-white to-white rounded-[18px] shadow-sm border border-brand-turquoise/20 p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="text-center md:text-left">
             <h1 className="text-2xl font-bold text-brand-midnight mb-1">
@@ -160,7 +101,7 @@ const HeaderCard: React.FC<{ meta: ReportMeta, scores: GlobalScores }> = ({ meta
     </div>
 );
 
-const SynthesisCard: React.FC<{ synthese: Synthese, sections: SectionScore[] }> = ({ synthese, sections }) => (
+const SynthesisCard: React.FC<{ synthese: DiagnosticSynthesis, sections: SectionScore[] }> = ({ synthese, sections }) => (
     <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8 space-y-6">
         <div>
             <h2 className="text-lg font-bold text-brand-midnight mb-2">1. Synthèse globale</h2>
@@ -232,7 +173,7 @@ const DetailedAnalysisCard: React.FC<{ analyses: SectionAnalysis[], sections: Se
     </div>
 );
 
-const RecommendationsCard: React.FC<{ recos: Recommendation[] }> = ({ recos }) => (
+const RecommendationsCard: React.FC<{ recos: ActionPlanItem[] }> = ({ recos }) => (
     <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8">
         <h2 className="text-lg font-bold text-brand-midnight mb-2">3. Recommandations & plan d’action</h2>
         <p className="text-sm text-slate-500 mb-6">Les pistes ci-dessous sont priorisées pour faciliter le passage à l’action.</p>
@@ -271,7 +212,7 @@ const MyResult: React.FC = () => {
     }
 
     // Unwrap 'json' if present
-    const reportData: ReportData = (candidateData && candidateData.json) ? candidateData.json : (candidateData || {});
+    const reportData: DiagnosticReport = (candidateData && candidateData.json) ? candidateData.json : (candidateData || {});
 
     // Validation: Check for a key property like 'scores'
     const hasValidData = reportData && reportData.scores;

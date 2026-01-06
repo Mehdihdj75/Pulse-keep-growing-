@@ -1,58 +1,210 @@
-{
-  "meta": {
-    "user_id": "12345",
-    "prenom": "Jean",
-    "nom": "Dupont",
-    "role": "Directeur"
-  },
-  "scores": {
-    "global_score": 3.8,
-    "global_score_pct": 76,
-    "global_niveau": "Solide",
-    "global_color": "#20a4a0",
-    "sections": [
-      {
-        "id": "s1",
-        "nom": "Entreprise & Contexte",
-        "score": 4.5,
-        "score_pct": 90,
-        "niveau": "Excellent",
-        "color": "#5cb85c"
-      },
-      {
-        "id": "s2",
-        "nom": "Vision & Formalisation",
-        "score": 3.0,
-        "score_pct": 60,
-        "niveau": "Solide",
-        "color": "#20a4a0"
-      }
-    ]
-  },
-  "synthese": {
-    "resume_global": "Un bon diagnostic global qui révèle...",
-    "forces_principales": "Force 1, Force 2",
-    "axes_de_vigilance": "Vigilance 1, Vigilance 2"
-  },
-  "analyse_detaillee_par_sections": [
-    {
-      "section_id": "s2",
-      "section_nom": "Vision & Formalisation",
-      "themes": [
+[
+  {
+    "meta": {
+      "user_id": "mehdi.hadjoudj@alegria.academy",
+      "prenom": "Utilisateur ",
+      "nom": "",
+      "role": ""
+    },
+    "scores": {
+      "global_score": 3.2,
+      "global_score_pct": 64,
+      "global_niveau": "À consolider",
+      "global_color": "#f0ad4e",
+      "sections": [
         {
-          "titre": "Thème 1",
-          "texte": "Détail du thème..."
+          "id": "s2",
+          "nom": "2. Vision & Formalisation",
+          "score": 3,
+          "score_pct": 60,
+          "niveau": "À consolider",
+          "color": "#f0ad4e"
+        },
+        {
+          "id": "s3",
+          "nom": "3. Utilisation du CRM",
+          "score": 3,
+          "score_pct": 60,
+          "niveau": "À consolider",
+          "color": "#f0ad4e"
+        },
+        {
+          "id": "s4",
+          "nom": "4. Discipline & Suivi",
+          "score": 3.33,
+          "score_pct": 67,
+          "niveau": "À consolider",
+          "color": "#f0ad4e"
+        },
+        {
+          "id": "s5",
+          "nom": "5. Rituels & Alignement",
+          "score": 4,
+          "score_pct": 80,
+          "niveau": "Solide",
+          "color": "#20a4a0"
+        },
+        {
+          "id": "s6",
+          "nom": "6. Qualité & Prise de décision",
+          "score": 3.67,
+          "score_pct": 73,
+          "niveau": "Solide",
+          "color": "#20a4a0"
+        },
+        {
+          "id": "s7",
+          "nom": "7. Appropriation & Responsabilité",
+          "score": 3,
+          "score_pct": 60,
+          "niveau": "À consolider",
+          "color": "#f0ad4e"
+        },
+        {
+          "id": "s8",
+          "nom": "8. Symptômes & Risques",
+          "score": 2,
+          "score_pct": 40,
+          "niveau": "Critique",
+          "color": "#d9534f"
         }
       ]
-    }
-  ],
-  "recommandations_et_plan_action": [
-    {
-      "priorite": 1,
-      "titre": "Action immédiate",
-      "description": "Description de l'action...",
-      "horizon": "Court terme"
-    }
-  ],
-  "conclusion": "Conclusion générale..."
-}
+    },
+    "synthese": {
+      "resume_global": "Bonjour Utisateur, nous vous présentons le diagnostic de votre pipeline commercial basé sur vos réponses au questionnaire. Votre score global est de 3.2 sur 5, indiquant une maturité moyenne avec des axes d'amélioration importants pour optimiser la performance commerciale. Vous avez identifié comme principales difficultés les blocages sur l'acquisition/génération de leads et la proposition/devis, ce qui nécessite un travail structuré sur la formalisation du cycle et l'utilisation du CRM. Nous vous détaillons ci-dessous l'analyse des points faibles identifiés ainsi que des recommandations adaptées pour soutenir votre développement commercial.",
+      "forces_principales": "",
+      "axes_de_vigilance": ""
+    },
+    "analyse_detaillee_par_sections": [
+      {
+        "section_id": "s8",
+        "section_nom": "8. Symptômes & Risques",
+        "themes": [
+          {
+            "titre": "Diagnostic",
+            "texte": "Cette dimension révèle une fragilité majeure liée à une mauvaise explication des pertes de deals et des réunions pipeline qui manquent de clarté, de structure et d'orientation action."
+          },
+          {
+            "titre": "Causes probables",
+            "texte": "Absence d'un suivi rigoureux et transparent des causes de perte des opportunités.\n- Manque de rituels efficaces dans les réunions pipeline pour prioriser et réagir aux risques.\n- Éventuel désalignement entre les équipes sur les critères de qualification et d'avancement des opportunités."
+          },
+          {
+            "titre": "Recommandations",
+            "texte": "Mettre en place un processus systématique d’analyse des pertes (post-mortem) pour comprendre et capitaliser sur les échecs.\n- Structurer les rituels de réunion pipeline avec des formats clairs, orientés résultats et actions concrètes.\n- Former les équipes à la rigueur de la qualification et au suivi des étapes du cycle pour réduire les pertes inexpliquées."
+          }
+        ]
+      },
+      {
+        "section_id": "s2",
+        "section_nom": "2. Vision & Formalisation",
+        "themes": [
+          {
+            "titre": "Diagnostic",
+            "texte": "Le cycle de vente n’est pas complètement clair ni parfaitement aligné avec la réalité de la vente, ce qui crée des incompréhensions et une formalisation insuffisante pour guider les équipes."
+          },
+          {
+            "titre": "Causes probables",
+            "texte": "Étapes du cycle pas assez définies avec des critères objectifs partagés.\n- Manque d'alignement entre la vision théorique du cycle et la pratique terrain.\n- Insuffisance de communication et de formation autour du cycle commercial."
+          },
+          {
+            "titre": "Recommandations",
+            "texte": "Clarifier et formaliser chaque étape du cycle de vente avec des critères quantifiés et partagés.\n- Valider avec les équipes terrain la cohérence du cycle avec leur réalité et ajuster le modèle.\n- Déployer des sessions régulières d’appropriation du cycle et de partage de bonne pratique."
+          }
+        ]
+      },
+      {
+        "section_id": "s3",
+        "section_nom": "3. Utilisation du CRM",
+        "themes": [
+          {
+            "titre": "Diagnostic",
+            "texte": "Le CRM est sous-utilisé ou peu fiable, avec des mises à jour irrégulières et un décalage entre les étapes CRM et le cycle réel, limitant la visibilité sur le pipeline."
+          },
+          {
+            "titre": "Causes probables",
+            "texte": "Manque de discipline et d’habitude dans la mise à jour régulière du CRM.\n- Absence d’alignement entre la configuration du CRM et les étapes du cycle formalisé.\n- Faible adoption du CRM par certains commerciaux considérant l’outil comme une contrainte."
+          },
+          {
+            "titre": "Recommandations",
+            "texte": "Reparamétrer le CRM pour qu’il reflète parfaitement le cycle de vente défini.\n- Mettre en place des KPIs et rituels pour pousser les commerciaux à actualiser le CRM systématiquement.\n- Former les équipes pour intégrer le CRM comme un outil d’aide à la vente et non de contrôle."
+          }
+        ]
+      }
+    ],
+    "recommandations_et_plan_action": [
+      {
+        "priorite": 1,
+        "titre": "Structurer les réunions pipeline avec agenda clair et focus ",
+        "description": "Structurer les réunions pipeline avec agenda clair et focus sur les risques et actions.",
+        "horizon": "Immédiat"
+      },
+      {
+        "priorite": 2,
+        "titre": "Former rapidement les équipes sur la mise à jour rigoureuse ",
+        "description": "Former rapidement les équipes sur la mise à jour rigoureuse du CRM.",
+        "horizon": "Immédiat"
+      },
+      {
+        "priorite": 3,
+        "titre": "Clarifier les étapes clés du cycle de vente et communiquer f",
+        "description": "Clarifier les étapes clés du cycle de vente et communiquer fortement à toute l’équipe.",
+        "horizon": "Immédiat"
+      },
+      {
+        "priorite": 4,
+        "titre": "Lancer des analyses post-mortem systématiques sur les deals ",
+        "description": "Lancer des analyses post-mortem systématiques sur les deals perdus.",
+        "horizon": "Court terme"
+      },
+      {
+        "priorite": 5,
+        "titre": "Valider avec terrain et management une version finalisée du ",
+        "description": "Valider avec terrain et management une version finalisée du cycle de vente avec critères objectifs.",
+        "horizon": "Court terme"
+      },
+      {
+        "priorite": 6,
+        "titre": "Adapter le CRM pour aligner les étapes avec le cycle et simp",
+        "description": "Adapter le CRM pour aligner les étapes avec le cycle et simplifier la saisie.",
+        "horizon": "Court terme"
+      },
+      {
+        "priorite": 7,
+        "titre": "Instituer des formations approfondies et ateliers de pratiqu",
+        "description": "Instituer des formations approfondies et ateliers de pratique sur le cycle et le CRM.",
+        "horizon": "Moyen terme"
+      },
+      {
+        "priorite": 8,
+        "titre": "Mettre en place une gouvernance et des rituels réguliers cen",
+        "description": "Mettre en place une gouvernance et des rituels réguliers centrés sur la performance pipeline.",
+        "horizon": "Moyen terme"
+      },
+      {
+        "priorite": 9,
+        "titre": "Débuter un coaching individuel ou collectif pour ancrer les ",
+        "description": "Débuter un coaching individuel ou collectif pour ancrer les bonnes pratiques commerciales.",
+        "horizon": "Moyen terme"
+      },
+      {
+        "priorite": 10,
+        "titre": "Mesurer l’impact des changements sur la qualité des données ",
+        "description": "Mesurer l’impact des changements sur la qualité des données et la réduction des pertes incomprises.",
+        "horizon": "Plus long terme"
+      },
+      {
+        "priorite": 11,
+        "titre": "Déployer un plan continu d’amélioration avec coaching et opt",
+        "description": "Déployer un plan continu d’amélioration avec coaching et optimisation des outils (CRM, reporting).",
+        "horizon": "Plus long terme"
+      },
+      {
+        "priorite": 12,
+        "titre": "Envisager un accompagnement Keep Growing via les offres Teac",
+        "description": "Envisager un accompagnement Keep Growing via les offres Teach You et Done With You pour durer dans la transformation.",
+        "horizon": "Plus long terme"
+      }
+    ],
+    "conclusion": ""
+  }
+]
