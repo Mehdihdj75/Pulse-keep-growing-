@@ -299,11 +299,11 @@ const MyResult: React.FC = () => {
                 {/* Navigation & Actions */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <Link
-                        to="/"
+                        to="/diagnostics"
                         className="flex items-center text-slate-400 hover:text-brand-midnight transition-colors font-bold text-sm"
                     >
                         <ArrowLeft size={18} className="mr-2" />
-                        Retour au tableau de bord
+                        Retour aux résultats
                     </Link>
 
                     {/* PDF Download Button */}
