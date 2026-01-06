@@ -23,6 +23,9 @@ const SignUp: React.FC = () => {
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email,
                 password,
+                options: {
+                    emailRedirectTo: window.location.origin,
+                }
             });
 
             if (authError) throw authError;

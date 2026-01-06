@@ -3,6 +3,10 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Download, AlertTriangle, LayoutDashboard } from 'lucide-react';
 
 import { DiagnosticReport, DiagnosticMeta, DiagnosticScores, DiagnosticSynthesis, SectionAnalysis, ActionPlanItem, SectionScore } from '../types';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 // --- MOCK DATA FOR DEV/FALLBACK ---
 const MOCK_REPORT_DATA: DiagnosticReport = {
@@ -196,16 +200,46 @@ const RecommendationsCard: React.FC<{ recos: ActionPlanItem[] }> = ({ recos }) =
 const MyResult: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { result, answers } = location.state || {}; // Retrieve passed data
+    const { profile } = useAuth(); // Get auth profile for name fallback
+    const { result, answers, diagnosticId } = location.state || {}; // Retrieve passed data
+    const [dbReport, setDbReport] = React.useState<DiagnosticReport | null>(null);
+    const [loading, setLoading] = React.useState(false);
 
+    // Fetch from DB if no state (e.g. direct link or history)
+    // Note: We might want to use a query param or URL param :id
+    React.useEffect(() => {
+        if (!result && !loading) {
+            // Check if we have an ID in URL search params (if we implement history links)
+            const searchParams = new URLSearchParams(location.search);
+            const id = searchParams.get('id');
+            if (id) {
+                setLoading(true);
+                supabase.from('diagnostics').select('report_data').eq('id', id).single()
+                    .then(({ data, error }) => {
+                        if (data && data.report_data) {
+                            setDbReport(data.report_data);
+                        }
+                        setLoading(false);
+                    });
+            }
+        }
+    }, [location, result]);
 
+    const handleDownloadPDF = async () => {
+        const input = document.getElementById('report-content');
+        if (!input) return;
 
-    // Logic to determine if we should use mock data
-    // We try to extract data from various possible n8n return formats:
-    // 1. Array with json wrapper: [{ json: { scores: ... } }]
-    // 2. Single object with json wrapper: { json: { scores: ... } }
-    // 3. Direct object: { scores: ... }
-    let candidateData = result;
+        const canvas = await html2canvas(input, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Pulse_Report_${profile?.nom || 'Export'}.pdf`);
+    };
+
+    let candidateData = dbReport || result;
 
     if (Array.isArray(result) && result.length > 0) {
         candidateData = result[0];
@@ -225,7 +259,7 @@ const MyResult: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-brand-soft-bg p-4 md:p-8 lg:p-12 animate-fade-in font-sans">
-            <div className="max-w-[1120px] mx-auto space-y-6">
+            <div className="max-w-[1120px] mx-auto space-y-6" id="report-content">
 
                 {/* Navigation & Actions */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -237,8 +271,11 @@ const MyResult: React.FC = () => {
                         Retour au tableau de bord
                     </Link>
 
-                    {/* PDF Download Button (Mock function for now if no URL) */}
-                    <button className="flex items-center gap-2 bg-brand-midnight text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-800 transition-colors shadow-lg shadow-brand-midnight/20">
+                    {/* PDF Download Button */}
+                    <button
+                        onClick={handleDownloadPDF}
+                        className="flex items-center gap-2 bg-brand-midnight text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-800 transition-colors shadow-lg shadow-brand-midnight/20"
+                    >
                         <Download size={18} />
                         <span>Télécharger le PDF</span>
                     </button>
@@ -251,8 +288,15 @@ const MyResult: React.FC = () => {
                     </div>
                 )}
 
-                {/* 1. Header Card */}
-                <HeaderCard meta={finalReportData.meta || {}} scores={finalReportData.scores || { global_score: 0, global_score_pct: 0, global_niveau: "-", sections: [] }} />
+                {/* 1. Header Card - Use profile name if meta is generic */}
+                <HeaderCard
+                    meta={{
+                        ...finalReportData.meta,
+                        prenom: (finalReportData.meta?.prenom === 'Utilisateur' || !finalReportData.meta?.prenom) && profile?.prenom ? profile.prenom : finalReportData.meta?.prenom,
+                        nom: (finalReportData.meta?.nom === '' || !finalReportData.meta?.nom) && profile?.nom ? profile.nom : finalReportData.meta?.nom
+                    }}
+                    scores={finalReportData.scores || { global_score: 0, global_score_pct: 0, global_niveau: "-", sections: [] }}
+                />
 
                 {/* 2. Synthesis Card */}
                 <SynthesisCard

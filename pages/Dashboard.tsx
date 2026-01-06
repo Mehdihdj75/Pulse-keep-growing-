@@ -14,7 +14,8 @@ const Dashboard: React.FC = () => {
     equipes: 0,
     collaborateurs: 0,
     scoreMoyen: 8.2,
-    totalDiagnostics: 62
+    totalDiagnostics: 0,
+    history: [] as any[]
   });
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +57,8 @@ const Dashboard: React.FC = () => {
             equipes: uniqueTeams,
             collaborateurs: collaboratorsCount,
             scoreMoyen,
-            totalDiagnostics
+            totalDiagnostics,
+            history: diagnostics // Store full list for history
           });
         }
       } catch (e) {
@@ -70,33 +72,77 @@ const Dashboard: React.FC = () => {
   }, [profile]);
 
   if (profile?.role === 'INDIVIDUEL') {
-    return (
-      <div className="max-w-4xl mx-auto mt-12 animate-fade-in">
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 p-12 border border-slate-100 text-center relative overflow-hidden">
-          {/* Decorative Background Elements */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-brand-turquoise/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-midnight/5 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
+    if (stats.totalDiagnostics === 0 && !loading) {
+      return (
+        <div className="max-w-4xl mx-auto mt-12 animate-fade-in">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 p-12 border border-slate-100 text-center relative overflow-hidden">
+            {/* Decorative Background Elements */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-brand-turquoise/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-midnight/5 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
 
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="w-20 h-20 bg-brand-turquoise/10 rounded-3xl flex items-center justify-center text-brand-turquoise mb-8 shadow-sm">
-              <TrendingUp size={40} />
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-20 h-20 bg-brand-turquoise/10 rounded-3xl flex items-center justify-center text-brand-turquoise mb-8 shadow-sm">
+                <TrendingUp size={40} />
+              </div>
+
+              <h1 className="text-4xl font-black text-brand-midnight tracking-tight mb-4">
+                Bienvenue sur <span className="text-brand-turquoise">Pulse Express</span>
+              </h1>
+
+              <p className="text-slate-500 text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+                Découvrez vos forces et vos axes d’amélioration en quelques minutes grâce à notre diagnostic personnalisé.
+              </p>
+
+              <Link
+                to="/diagnostic/start"
+                className="inline-flex items-center space-x-3 bg-brand-turquoise hover:bg-brand-turquoise-dark text-white text-lg font-bold px-8 py-4 rounded-2xl transition-all shadow-lg shadow-brand-turquoise/20 hover:scale-105 active:scale-95"
+              >
+                <span>Commencer mon diagnostic</span>
+                <TrendingUp size={20} />
+              </Link>
             </div>
+          </div>
+        </div>
+      );
+    }
 
-            <h1 className="text-4xl font-black text-brand-midnight tracking-tight mb-4">
-              Bienvenue sur <span className="text-brand-turquoise">Pulse Express</span>
-            </h1>
+    // Individual User WITH History
+    return (
+      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-brand-midnight tracking-tight">Bonjour, {profile?.prenom} 👋</h1>
+            <p className="text-slate-500 font-medium">Retrouvez vos rapports de diagnostic ci-dessous.</p>
+          </div>
+          <Link to="/diagnostic/start" className="bg-brand-midnight text-white px-5 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg">
+            + Nouveau Diagnostic
+          </Link>
+        </div>
 
-            <p className="text-slate-500 text-lg max-w-xl mx-auto mb-10 leading-relaxed">
-              Découvrez vos forces et vos axes d’amélioration en quelques minutes grâce à notre diagnostic personnalisé.
-            </p>
-
-            <Link
-              to="/diagnostic/start"
-              className="inline-flex items-center space-x-3 bg-brand-turquoise hover:bg-brand-turquoise-dark text-white text-lg font-bold px-8 py-4 rounded-2xl transition-all shadow-lg shadow-brand-turquoise/20 hover:scale-105 active:scale-95"
-            >
-              <span>Commencer mon diagnostic</span>
-              <TrendingUp size={20} />
-            </Link>
+        <div className="grid grid-cols-1 gap-6">
+          <h2 className="text-xl font-bold text-brand-midnight">Vos Rapports</h2>
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            {stats.history.map((diag: any) => (
+              <div key={diag.id} className="p-6 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors flex items-center justify-between group">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-brand-turquoise/10 rounded-2xl flex items-center justify-center text-brand-turquoise font-bold">
+                    {diag.score}/5
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-brand-midnight">{diag.questionnaire_title || 'Diagnostic Commercial'}</h3>
+                    <p className="text-xs text-slate-400">
+                      Réalisé le {new Date(diag.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to={`/diagnostic/result?id=${diag.id}`}
+                  className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:border-brand-turquoise hover:text-brand-turquoise transition-all"
+                >
+                  Voir le rapport
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </div>

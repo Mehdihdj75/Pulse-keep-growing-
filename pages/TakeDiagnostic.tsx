@@ -256,7 +256,7 @@ const TakeDiagnostic: React.FC = () => {
             const n8nResult = await sendToN8N(payload); // Capture response
 
             // 4. Save to Supabase (only numeric score stored for Dashboard avg)
-            const { error: dbError } = await supabase
+            const { data, error: dbError } = await supabase
                 .from('diagnostics')
                 .insert([{
                     user_id: profile.id,
@@ -265,16 +265,20 @@ const TakeDiagnostic: React.FC = () => {
                     score: Math.round(calculateAverageScore()), // Database expects integer
                     status: 'Terminé',
                     trend: 'stable',
-                    team_name: 'Personnel'
-                }]);
+                    team_name: 'Personnel',
+                    report_data: n8nResult // Store the full JSON report
+                }])
+                .select()
+                .single();
 
             if (dbError) throw dbError;
 
-            // 5. Redirect to processing with data
+            // 5. Redirect to processing with data AND the saved ID
             navigate('/diagnostic/processing', {
                 state: {
                     result: n8nResult,
-                    answers: answers
+                    answers: answers,
+                    diagnosticId: data?.id
                 }
             });
 

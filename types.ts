@@ -70,6 +70,8 @@ export interface DiagnosticResult {
   user_full_name?: string;
   questionnaire_title?: string;
   trend?: 'up' | 'down' | 'stable';
+  report_data?: any; // JSONB storage for the full n8n report
+  created_at?: string;
 }
 
 export interface Assignation {
