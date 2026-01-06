@@ -140,23 +140,48 @@ export const db = {
       }
 
       // Transformation des données pour correspondre à l'interface DiagnosticResult
-      return (data || []).map(d => {
-        // Safe access for joined tables which might be arrays or objects depending on Supabase version/types
-        const company = Array.isArray(d.companies) ? d.companies[0] : d.companies;
-        const profile = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
+      return (data || []).map(d => mapDiagnosticData(d)) as DiagnosticResult[];
+    },
 
-        return {
-          id: d.id,
-          company: company?.name || 'N/A',
-          firstName: profile?.prenom || 'Anonyme',
-          lastName: profile?.nom || '',
-          team: d.team_name || 'Général',
-          questionnaire: d.questionnaire_title || 'Diagnostic Pulse+',
-          status: d.status || 'En cours',
-          score: d.score || 0,
-          trend: (d.trend as any) || 'stable'
-        };
-      }) as DiagnosticResult[];
+    async getByUser(userId: string) {
+      const { data, error } = await supabase
+        .from('diagnostics')
+        .select(`
+          id,
+          user_id,
+          company_id,
+          questionnaire_title,
+          team_name,
+          score,
+          status,
+          trend,
+          created_at,
+          profiles:user_id (prenom, nom),
+          companies:company_id (name)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return (data || []).map(d => mapDiagnosticData(d)) as DiagnosticResult[];
     }
   }
+};
+
+const mapDiagnosticData = (d: any) => {
+  const company = Array.isArray(d.companies) ? d.companies[0] : d.companies;
+  const profile = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
+
+  return {
+    id: d.id,
+    company: company?.name || 'N/A',
+    firstName: profile?.prenom || 'Anonyme',
+    lastName: profile?.nom || '',
+    team: d.team_name || 'Général',
+    questionnaire: d.questionnaire_title || 'Diagnostic Pulse+',
+    status: d.status || 'En cours',
+    score: d.score || 0,
+    trend: (d.trend as any) || 'stable',
+    created_at: d.created_at
+  };
 };

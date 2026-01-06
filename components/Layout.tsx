@@ -59,9 +59,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   const navItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Tableau de bord', path: '/', roles: ['ADMIN', 'DIRECTEUR', 'MANAGER', 'INDIVIDUEL'] },
+    { icon: <ClipboardList size={20} />, label: 'Nouveau Diagnostic', path: '/diagnostic/start', roles: ['INDIVIDUEL'] },
     { icon: <Building2 size={20} />, label: 'Entreprises', path: '/entreprises', roles: ['ADMIN'] },
     { icon: <ClipboardList size={20} />, label: 'Questionnaires', path: '/questionnaires', roles: ['ADMIN', 'DIRECTEUR'] },
     { icon: <BarChart3 size={20} />, label: 'Diagnostics & Résultats', path: '/diagnostics', roles: ['ADMIN', 'DIRECTEUR', 'MANAGER'] },
+    { icon: <BarChart3 size={20} />, label: 'Mes Résultats', path: '/diagnostics', roles: ['INDIVIDUEL'] }, // Separate item for clarity
     { icon: <Contact2 size={20} />, label: 'Chargés de compte', path: '/charges-de-compte', roles: ['ADMIN'] },
     { icon: <Users size={20} />, label: 'Équipes', path: '/equipes', roles: ['DIRECTEUR', 'MANAGER'] },
   ];
@@ -69,10 +71,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const filteredItems = navItems.filter(item => {
     if (!profile || !item.roles.includes(profile.role)) return false;
 
-    // Logic for INDIVIDUEL: Hide Questionnaires and Diagnostics if no diagnostic completed
-    if (profile.role === 'INDIVIDUEL' && (item.path === '/questionnaires' || item.path === '/diagnostics')) {
-      return diagnosticCount > 0;
-    }
+    // Logic for INDIVIDUEL: Hide Questionnaires if no diagnostic completed (optional logic, disabling for now to show links)
+    // if (profile.role === 'INDIVIDUEL' && (item.path === '/questionnaires' || item.path === '/diagnostics')) {
+    //   return diagnosticCount > 0;
+    // }
 
     return true;
   });
