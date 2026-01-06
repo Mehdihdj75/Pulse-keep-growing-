@@ -229,13 +229,48 @@ const MyResult: React.FC = () => {
         const input = document.getElementById('report-content');
         if (!input) return;
 
-        const canvas = await html2canvas(input, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const availableWidth = pdfWidth - (margin * 2);
 
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        // Get all direct children sections
+        const sections = Array.from(input.children) as HTMLElement[];
+
+        // Remove navigation/buttons from PDF capture
+        const sectionsToCapture = sections.filter(el =>
+            !el.querySelector('button') && !el.querySelector('a')
+        );
+
+        let currentY = margin;
+
+        for (let i = 0; i < sectionsToCapture.length; i++) {
+            const section = sectionsToCapture[i];
+
+            // Skip processing for hidden or empty elements
+            if (section.offsetHeight === 0) continue;
+
+            const canvas = await html2canvas(section, {
+                scale: 2, // High resolution
+                logging: false,
+                useCORS: true,
+                backgroundColor: null // Transparent background
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgHeight = (canvas.height * availableWidth) / canvas.width;
+
+            // Check page overflow
+            if (currentY + imgHeight > pdfHeight - margin) {
+                pdf.addPage();
+                currentY = margin;
+            }
+
+            pdf.addImage(imgData, 'PNG', margin, currentY, availableWidth, imgHeight);
+            currentY += imgHeight + 5; // Add some spacing between sections
+        }
+
         pdf.save(`Pulse_Report_${profile?.nom || 'Export'}.pdf`);
     };
 
