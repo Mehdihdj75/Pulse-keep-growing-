@@ -42,19 +42,38 @@ export const buildN8NPayload = (respondant: string, email: string, answers: Answ
   }));
 };
 
+// Basic interface for the profile info needed for routing
+interface RoutingProfile {
+  role: string;
+  entreprise_id?: string;
+  [key: string]: any;
+}
+
 /**
- * Envoie les données au webhook n8n via une requête POST JSON.
- * Gère les erreurs de réponse et loggue l'activité.
- * Retourne le rapport de diagnostic généré par n8n.
+ * Envoie les réponses au webhook n8n approprié selon le profil utilisateur.
+ * 
+ * Logique de routage :
+ * 1. Pulse Express (Individuel Sans Entreprise) -> Webhook INDIVIDUEL
+ * 2. Pulse Team (Individuel AVEC Entreprise) -> Webhook CORP/ADMIN
+ * 3. Manager/Admin/Directeur -> Webhook CORP/ADMIN
  * 
  * @param items Les données à envoyer
- * @param role Le rôle de l'utilisateur pour déterminer quel webhook utiliser
+ * @param profile Le profil utilisateur pour le routage
  */
-export const sendToN8N = async (items: N8NSubmissionItem[]): Promise<DiagnosticReport> => {
-  console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses (Individuel)...`);
+export const sendToN8N = async (items: N8NSubmissionItem[], profile?: RoutingProfile): Promise<DiagnosticReport> => {
+  const isExpressUser = profile?.role === 'INDIVIDUEL' && !profile?.entreprise_id;
+
+  // Determine webhook URL
+  const targetUrl = isExpressUser
+    ? N8N_INDIVIDUAL_WEBHOOK_URL
+    : N8N_CORP_WEBHOOK_URL;
+
+  const mode = isExpressUser ? "Express (Individuel)" : "Team/Corp (Entreprise)";
+  console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses. Mode: ${mode}`);
+  console.log(`[Pulse n8n Connector] Cible : ${targetUrl}`);
 
   try {
-    const response = await fetch(N8N_INDIVIDUAL_WEBHOOK_URL, {
+    const response = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
