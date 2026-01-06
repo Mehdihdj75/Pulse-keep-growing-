@@ -4,7 +4,8 @@ import { DiagnosticReport } from '../types';
  * Service de communication avec n8n pour l'automatisation des diagnostics Pulse.
  */
 
-export const N8N_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/7e875dda-419b-43f9-ba61-4b88e268156f";
+export const N8N_INDIVIDUAL_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/7e875dda-419b-43f9-ba61-4b88e268156f";
+export const N8N_CORP_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/eb4b6d08-10fb-47b6-9e41-46f46d281c83";
 
 export interface Answer {
   section: string;
@@ -45,12 +46,24 @@ export const buildN8NPayload = (respondant: string, email: string, answers: Answ
  * Envoie les données au webhook n8n via une requête POST JSON.
  * Gère les erreurs de réponse et loggue l'activité.
  * Retourne le rapport de diagnostic généré par n8n.
+ * 
+ * @param items Les données à envoyer
+ * @param role Le rôle de l'utilisateur pour déterminer quel webhook utiliser
  */
-export const sendToN8N = async (items: N8NSubmissionItem[]): Promise<DiagnosticReport> => {
-  console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses...`, items);
+export const sendToN8N = async (items: N8NSubmissionItem[], role?: string): Promise<DiagnosticReport> => {
+  console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses pour le rôle ${role}...`);
+
+  // Determine webhook URL based on role
+  // Default to INDIVIDUAL if role is 'INDIVIDUEL' or undefined
+  // Use CORP for ADMIN, MANAGER, DIRECTEUR
+  const targetUrl = (role === 'INDIVIDUEL' || !role)
+    ? N8N_INDIVIDUAL_WEBHOOK_URL
+    : N8N_CORP_WEBHOOK_URL;
+
+  console.log(`[Pulse n8n Connector] Cible : ${targetUrl}`);
 
   try {
-    const response = await fetch(N8N_WEBHOOK_URL, {
+    const response = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
