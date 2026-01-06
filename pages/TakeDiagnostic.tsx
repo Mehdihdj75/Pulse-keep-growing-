@@ -174,6 +174,45 @@ const TakeDiagnostic: React.FC = () => {
     // State pour stocker les réponses (number | string | string[])
     const [answers, setAnswers] = useState<Record<string, any>>({});
     const [error, setError] = useState<string | null>(null);
+    const [isLimitReached, setIsLimitReached] = useState(false);
+
+    React.useEffect(() => {
+        const checkLimit = async () => {
+            if (profile?.id) {
+                const { count, error } = await supabase
+                    .from('diagnostics')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', profile.id);
+
+                if (!error && count !== null && count >= 3) {
+                    setIsLimitReached(true);
+                }
+            }
+        };
+        checkLimit();
+    }, [profile]);
+
+    if (isLimitReached) {
+        return (
+            <div className="max-w-3xl mx-auto pt-10 text-center space-y-6 animate-fade-in">
+                <div className="w-20 h-20 bg-amber-50 rounded-3xl flex items-center justify-center text-amber-500 mx-auto">
+                    <AlertTriangle size={40} />
+                </div>
+                <h1 className="text-2xl font-black text-brand-midnight">Limite atteinte</h1>
+                <p className="text-slate-500 max-w-md mx-auto">
+                    Vous avez atteint la limite de 3 diagnostics gratuits. Pour aller plus loin et obtenir une analyse approfondie, contactez votre manager ou notre équipe support.
+                </p>
+                <div className="flex justify-center gap-4">
+                    <button onClick={() => navigate('/')} className="px-6 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors">
+                        Retour au tableau de bord
+                    </button>
+                    <button onClick={() => navigate('/diagnostics')} className="px-6 py-3 bg-brand-turquoise text-white rounded-xl font-bold text-sm hover:bg-brand-turquoise-dark transition-colors shadow-lg shadow-brand-turquoise/20">
+                        Mes Résultats
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     // Liste à plat pour validation
     const flattenedQuestions = useMemo(() => {
