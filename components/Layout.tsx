@@ -125,7 +125,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
             <div className="h-8 w-px bg-slate-100"></div>
 
-            <div className="flex items-center space-x-3 cursor-pointer group">
+            <Link to="/profil" className="flex items-center space-x-3 cursor-pointer group">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-brand-midnight group-hover:text-brand-turquoise transition-colors">
                   {profile?.prenom} {profile?.nom}
@@ -141,7 +141,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
               </div>
               <ChevronDown size={14} className="text-slate-400" />
-            </div>
+            </Link>
           </div>
         </header>
 

@@ -11,6 +11,7 @@ const Questionnaires = lazy(() => import('./pages/Questionnaires'));
 const Diagnostics = lazy(() => import('./pages/Diagnostics'));
 const AccountManagers = lazy(() => import('./pages/AccountManagers'));
 const TakeDiagnostic = lazy(() => import('./pages/TakeDiagnostic'));
+const Profile = lazy(() => import('./pages/Profile'));
 const Login = lazy(() => import('./pages/Login'));
 const SignUp = lazy(() => import('./pages/SignUp'));
 
@@ -47,7 +48,9 @@ const AppContent: React.FC = () => {
         <Route path="/entreprises" element={<ProtectedRoute><Entreprises /></ProtectedRoute>} />
         <Route path="/questionnaires" element={<ProtectedRoute><Questionnaires /></ProtectedRoute>} />
         <Route path="/diagnostics" element={<ProtectedRoute><Diagnostics /></ProtectedRoute>} />
+        <Route path="/diagnostics" element={<ProtectedRoute><Diagnostics /></ProtectedRoute>} />
         <Route path="/charges-de-compte" element={<ProtectedRoute><AccountManagers /></ProtectedRoute>} />
+        <Route path="/profil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/diagnostic/start" element={<ProtectedRoute><TakeDiagnostic /></ProtectedRoute>} />
         <Route path="/diagnostic/processing" element={<ProtectedRoute><DiagnosticProcessing /></ProtectedRoute>} />
         <Route path="/diagnostic/result" element={<ProtectedRoute><MyResult /></ProtectedRoute>} />
