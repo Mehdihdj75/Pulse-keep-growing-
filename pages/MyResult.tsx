@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Download, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import PremiumReport from '../components/PremiumReport';
 
 import { DiagnosticReport, DiagnosticMeta, DiagnosticScores, DiagnosticSynthesis, SectionAnalysis, ActionPlanItem, SectionScore } from '../types';
 import jsPDF from 'jspdf';
@@ -226,52 +227,52 @@ const MyResult: React.FC = () => {
     }, [location, result]);
 
     const handleDownloadPDF = async () => {
-        const input = document.getElementById('report-content');
+        const input = document.getElementById('premium-report-content');
         if (!input) return;
 
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const availableWidth = pdfWidth - (margin * 2);
+        const margin = 0; // No margin as the design has its own padding/bg
+        const availableWidth = pdfWidth;
 
-        // Get all direct children sections
-        const sections = Array.from(input.children) as HTMLElement[];
+        // Force display block for capture, although it's off-screen
+        input.style.display = 'block';
 
-        // Remove navigation/buttons from PDF capture
-        const sectionsToCapture = sections.filter(el =>
-            !el.querySelector('button') && !el.querySelector('a')
-        );
+        const canvas = await html2canvas(input, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#0a0f1a', // Match theme background
+            logging: false,
+            windowWidth: 1200 // Force wide render for desktop layout
+        });
 
-        let currentY = margin;
+        // Split into pages if needed (basic A4 ratio check)
+        // With this design, it's better to capture sections or the whole thing.
+        // Given it's a specific design, let's try to fit or split intelligently.
+        // For V1, let's just create a multi-page PDF by slicing the canvas.
 
-        for (let i = 0; i < sectionsToCapture.length; i++) {
-            const section = sectionsToCapture[i];
+        const imgWidth = pdfWidth;
+        const pageHeight = pdfHeight;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
 
-            // Skip processing for hidden or empty elements
-            if (section.offsetHeight === 0) continue;
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
 
-            const canvas = await html2canvas(section, {
-                scale: 2, // High resolution
-                logging: false,
-                useCORS: true,
-                backgroundColor: null // Transparent background
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            const imgHeight = (canvas.height * availableWidth) / canvas.width;
-
-            // Check page overflow
-            if (currentY + imgHeight > pdfHeight - margin) {
-                pdf.addPage();
-                currentY = margin;
-            }
-
-            pdf.addImage(imgData, 'PNG', margin, currentY, availableWidth, imgHeight);
-            currentY += imgHeight + 5; // Add some spacing between sections
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
         }
 
-        pdf.save(`Pulse_Report_${profile?.nom || 'Export'}.pdf`);
+        pdf.save(`Pulse_Express_${profile?.nom || 'Rapport'}.pdf`);
+
+        // Hide again
+        input.style.display = 'none';
     };
 
     let candidateData = dbReport || result;
@@ -359,6 +360,20 @@ const MyResult: React.FC = () => {
                 <div className="text-center text-xs text-slate-400 mt-8">
                     Rapport généré automatiquement par votre workflow Pulse+ IA.
                 </div>
+            </div>
+
+            {/* Hidden container for PDF generation */}
+            <div style={{ position: 'absolute', top: -10000, left: -10000, overflow: 'hidden' }}>
+                <PremiumReport report={{
+                    ...finalReportData,
+                    meta: {
+                        ...finalReportData.meta,
+                        // Ensure we use the latest profile name if available
+                        prenom: profile?.prenom || finalReportData.meta?.prenom || 'Utilisateur',
+                        nom: profile?.nom || finalReportData.meta?.nom || '',
+                        role: profile?.role || finalReportData.meta?.role || 'Individuel'
+                    }
+                }} />
             </div>
         </div>
     );
