@@ -271,7 +271,7 @@ const TakeDiagnostic: React.FC = () => {
             const payload = buildN8NPayload(`${profile.prenom} ${profile.nom}`, profile.email, payloadAnswers);
 
             // 3. Send to n8n
-            const n8nResult = await sendToN8N(payload, profile.role); // Capture response
+            const n8nResult = await sendToN8N(payload); // Capture response
 
             // 4. Save to Supabase (only numeric score stored for Dashboard avg)
             const { data, error: dbError } = await supabase
