@@ -39,6 +39,8 @@ const Diagnostics: React.FC = () => {
         let data: DiagnosticResult[] = [];
         if (profile?.role === 'INDIVIDUEL') {
           data = await db.diagnostics.getByUser(profile.id);
+          // Limit to 3 most recent results for individual users
+          data = data.slice(0, 3);
         } else {
           data = await db.diagnostics.getAll();
         }
@@ -116,14 +118,16 @@ const Diagnostics: React.FC = () => {
         </div>
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Activité</p>
-            <p className="text-[10px] font-bold text-emerald-500 mt-2 uppercase flex items-center">
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
-              Temps réel Supabase
-            </p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Meilleur Score</p>
+            <div className="flex items-baseline space-x-2 mt-2">
+              <span className="text-4xl font-black text-brand-turquoise">
+                {items.length > 0 ? Math.max(...items.map(i => i.score || 0)).toFixed(1) : '-'}
+              </span>
+              <span className="text-xs font-bold text-slate-300">/ 10</span>
+            </div>
           </div>
-          <div className="w-16 h-16 bg-slate-50 flex items-center justify-center rounded-2xl text-slate-400">
-            <Activity size={32} />
+          <div className="w-16 h-16 bg-brand-turquoise/10 flex items-center justify-center rounded-2xl text-brand-turquoise">
+            <TrendingUp size={32} />
           </div>
         </div>
       </div>
