@@ -10,6 +10,7 @@ const Entreprises = lazy(() => import('./pages/Entreprises'));
 const Questionnaires = lazy(() => import('./pages/Questionnaires'));
 const Diagnostics = lazy(() => import('./pages/Diagnostics'));
 const AccountManagers = lazy(() => import('./pages/AccountManagers'));
+const Team = lazy(() => import('./pages/Team'));
 const TakeDiagnostic = lazy(() => import('./pages/TakeDiagnostic'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Login = lazy(() => import('./pages/Login'));
@@ -50,6 +51,7 @@ const AppContent: React.FC = () => {
         <Route path="/diagnostics" element={<ProtectedRoute><Diagnostics /></ProtectedRoute>} />
         <Route path="/diagnostics" element={<ProtectedRoute><Diagnostics /></ProtectedRoute>} />
         <Route path="/charges-de-compte" element={<ProtectedRoute><AccountManagers /></ProtectedRoute>} />
+        <Route path="/equipes" element={<ProtectedRoute><Team /></ProtectedRoute>} />
         <Route path="/profil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/diagnostic/start" element={<ProtectedRoute><TakeDiagnostic /></ProtectedRoute>} />
         <Route path="/diagnostic/processing" element={<ProtectedRoute><DiagnosticProcessing /></ProtectedRoute>} />
