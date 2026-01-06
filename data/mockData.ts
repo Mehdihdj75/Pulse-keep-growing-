@@ -11,6 +11,7 @@ export const companies: Company[] = [
 ];
 
 export const questionnaires: Questionnaire[] = [
+  { id: 'Pulse-Sales-v2', name: 'Diagnostic Commercial Pulse (Importé)', employees: 0, sections: 8, subSections: 55, questions: 391, status: 'Actif', createdAt: '06/01/2026', updatedAt: '06/01/2026' },
   { id: 'Q-101', name: 'Évaluation Annuelle 2024', employees: 15, sections: 5, subSections: 12, questions: 45, status: 'Actif', createdAt: '15/01/2024', updatedAt: '20/06/2024' },
   { id: 'Q-102', name: 'Feedback Trimestriel Q2', employees: 42, sections: 3, subSections: 8, questions: 25, status: 'Actif', createdAt: '01/04/2024', updatedAt: '18/06/2024' },
   { id: 'Q-103', name: 'Engagement Collaborateur', employees: 63, sections: 4, subSections: 10, questions: 35, status: 'Actif', createdAt: '10/02/2024', updatedAt: '22/05/2024' },
