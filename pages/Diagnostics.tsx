@@ -61,7 +61,8 @@ const Diagnostics: React.FC = () => {
           section: "Section 1 - Vision",
           rubrique: "Vision support",
           question: "Q1",
-          score: Math.floor(Math.random() * 4)
+          score: Math.floor(Math.random() * 4),
+          email: "test@example.com" // Mock email for manual sync
         }
       }
     ];
