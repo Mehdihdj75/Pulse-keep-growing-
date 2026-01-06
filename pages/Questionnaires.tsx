@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Questionnaires } from '../data/mockData'; // Renaming locally to avoid conflict if needed, or just use mockData
 import { questionnaires as initialQuestionnaires } from '../data/mockData';
 import { QuestionnaireWizard } from '../components/QuestionnaireWizard';
 import { RawQuestionnaire } from '../utils/questionnaireHelpers';
