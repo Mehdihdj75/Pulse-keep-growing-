@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "user_id": "12345",
+    "prenom": "Jean",
+    "nom": "Dupont",
+    "role": "Directeur"
+  },
+  "scores": {
+    "global_score": 3.8,
+    "global_score_pct": 76,
+    "global_niveau": "Solide",
+    "global_color": "#20a4a0",
+    "sections": [
+      {
+        "id": "s1",
+        "nom": "Entreprise & Contexte",
+        "score": 4.5,
+        "score_pct": 90,
+        "niveau": "Excellent",
+        "color": "#5cb85c"
+      },
+      {
+        "id": "s2",
+        "nom": "Vision & Formalisation",
+        "score": 3.0,
+        "score_pct": 60,
+        "niveau": "Solide",
+        "color": "#20a4a0"
+      }
+    ]
+  },
+  "synthese": {
+    "resume_global": "Un bon diagnostic global qui révèle...",
+    "forces_principales": "Force 1, Force 2",
+    "axes_de_vigilance": "Vigilance 1, Vigilance 2"
+  },
+  "analyse_detaillee_par_sections": [
+    {
+      "section_id": "s2",
+      "section_nom": "Vision & Formalisation",
+      "themes": [
+        {
+          "titre": "Thème 1",
+          "texte": "Détail du thème..."
+        }
+      ]
+    }
+  ],
+  "recommandations_et_plan_action": [
+    {
+      "priorite": 1,
+      "titre": "Action immédiate",
+      "description": "Description de l'action...",
+      "horizon": "Court terme"
+    }
+  ],
+  "conclusion": "Conclusion générale..."
+}
