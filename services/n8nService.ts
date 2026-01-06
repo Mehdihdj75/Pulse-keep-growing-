@@ -50,20 +50,11 @@ export const buildN8NPayload = (respondant: string, email: string, answers: Answ
  * @param items Les données à envoyer
  * @param role Le rôle de l'utilisateur pour déterminer quel webhook utiliser
  */
-export const sendToN8N = async (items: N8NSubmissionItem[], role?: string): Promise<DiagnosticReport> => {
-  console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses pour le rôle ${role}...`);
-
-  // Determine webhook URL based on role
-  // Default to INDIVIDUAL if role is 'INDIVIDUEL' or undefined
-  // Use CORP for ADMIN, MANAGER, DIRECTEUR
-  const targetUrl = (role === 'INDIVIDUEL' || !role)
-    ? N8N_INDIVIDUAL_WEBHOOK_URL
-    : N8N_CORP_WEBHOOK_URL;
-
-  console.log(`[Pulse n8n Connector] Cible : ${targetUrl}`);
+export const sendToN8N = async (items: N8NSubmissionItem[]): Promise<DiagnosticReport> => {
+  console.log(`[Pulse n8n Connector] Tentative d'envoi de ${items.length} réponses (Individuel)...`);
 
   try {
-    const response = await fetch(targetUrl, {
+    const response = await fetch(N8N_INDIVIDUAL_WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -91,6 +82,37 @@ export const sendToN8N = async (items: N8NSubmissionItem[], role?: string): Prom
     return report as DiagnosticReport;
   } catch (error) {
     console.error(`[Pulse n8n Connector] Échec de l'envoi :`, error);
+    throw error;
+  }
+};
+
+/**
+ * Synchronise la définition d'un questionnaire avec le webhook n8n ADMIN/ENTREPRISE.
+ * 
+ * @param payload La structure du questionnaire à synchroniser
+ */
+export const syncQuestionnaireToN8N = async (payload: any): Promise<any> => {
+  console.log(`[Pulse n8n Connector] Synchronisation du questionnaire (Admin/Corp)...`, payload);
+
+  try {
+    const response = await fetch(N8N_CORP_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erreur HTTP n8n (Sync) : ${response.status} - ${errorText || response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(`[Pulse n8n Connector] Succès : Questionnaire synchronisé.`, data);
+    return data;
+  } catch (error) {
+    console.error(`[Pulse n8n Connector] Échec de la synchronisation :`, error);
     throw error;
   }
 };
