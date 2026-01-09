@@ -4,8 +4,8 @@ import { DiagnosticReport } from '../types';
  * Service de communication avec n8n pour l'automatisation des diagnostics Pulse.
  */
 
-export const N8N_INDIVIDUAL_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/7e875dda-419b-43f9-ba61-4b88e268156f";
-export const N8N_CORP_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/7e875dda-419b-43f9-ba61-4b88e268156f";
+export const N8N_INDIVIDUAL_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook/7e875dda-419b-43f9-ba61-4b88e268156f";
+export const N8N_CORP_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook/7e875dda-419b-43f9-ba61-4b88e268156f";
 
 export interface Answer {
   section: string;
