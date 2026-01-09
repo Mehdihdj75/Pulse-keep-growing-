@@ -4,6 +4,7 @@ import { Send, CheckCircle2, Loader2, AlertTriangle, Info, ArrowLeft, ChevronDow
 import { sendToN8N, buildN8NPayload, Answer } from '../services/n8nService';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+import { CustomSelect } from '../components/CustomSelect';
 
 // Nouveaux types pour le questionnaire flexible
 type QuestionType = 'scale' | 'select' | 'multiselect';
@@ -360,19 +361,12 @@ const TakeDiagnostic: React.FC = () => {
                                         )}
 
                                         {q.type === 'select' && (
-                                            <div className="relative">
-                                                <select
-                                                    value={answers[q.code] || ''}
-                                                    onChange={(e) => handleAnswerChange(q.code, e.target.value)}
-                                                    className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl appearance-none font-bold text-brand-midnight focus:ring-4 focus:ring-brand-turquoise/10 outline-none"
-                                                >
-                                                    <option value="" disabled>Sélectionnez une réponse...</option>
-                                                    {q.options?.map(opt => (
-                                                        <option key={opt} value={opt}>{opt}</option>
-                                                    ))}
-                                                </select>
-                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={20} />
-                                            </div>
+                                            <CustomSelect
+                                                value={answers[q.code] || ''}
+                                                onChange={(val) => handleAnswerChange(q.code, val)}
+                                                options={q.options || []}
+                                                placeholder="Sélectionnez une réponse..."
+                                            />
                                         )}
 
                                         {q.type === 'multiselect' && (

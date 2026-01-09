@@ -101,13 +101,15 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </nav>
 
         <div className="mt-auto border-t border-slate-800 pt-6">
-          <button
-            onClick={signOut}
-            className="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-rose-400 hover:bg-rose-400/10 w-full rounded-xl transition-all duration-200"
-          >
-            <LogOut size={20} />
-            <span className="font-medium text-sm">Déconnexion</span>
-          </button>
+          {profile?.role !== 'INDIVIDUEL' && (
+            <button
+              onClick={signOut}
+              className="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-rose-400 hover:bg-rose-400/10 w-full rounded-xl transition-all duration-200"
+            >
+              <LogOut size={20} />
+              <span className="font-medium text-sm">Déconnexion</span>
+            </button>
+          )}
         </div>
       </aside>
 
@@ -118,30 +120,34 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           <h2 className="text-brand-midnight font-bold text-xl">{location.pathname === '/charges-de-compte' ? 'Gestion des Chargés de compte' : location.pathname === '/profil' ? 'Mon Profil' : 'Pulse Express'}</h2>
 
           <div className="flex items-center space-x-6">
-            <button className="relative p-2 text-slate-400 hover:text-brand-midnight">
-              <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-            </button>
+            {profile?.role !== 'INDIVIDUEL' && (
+              <>
+                <button className="relative p-2 text-slate-400 hover:text-brand-midnight">
+                  <Bell size={20} />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+                </button>
 
-            <div className="h-8 w-px bg-slate-100"></div>
+                <div className="h-8 w-px bg-slate-100"></div>
 
-            <Link to="/profil" className="flex items-center space-x-3 cursor-pointer group">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-brand-midnight group-hover:text-brand-turquoise transition-colors">
-                  {profile?.prenom} {profile?.nom}
-                </p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{profile?.role}</p>
-              </div>
-              <div className="relative">
-                <img
-                  src={profile?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${profile?.prenom} ${profile?.nom}`}
-                  alt="Avatar"
-                  className="w-10 h-10 rounded-full ring-2 ring-slate-100 group-hover:ring-brand-turquoise transition-all bg-slate-50 object-cover"
-                />
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
-              </div>
-              <ChevronDown size={14} className="text-slate-400" />
-            </Link>
+                <Link to="/profil" className="flex items-center space-x-3 cursor-pointer group">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-bold text-brand-midnight group-hover:text-brand-turquoise transition-colors">
+                      {profile?.prenom} {profile?.nom}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{profile?.role}</p>
+                  </div>
+                  <div className="relative">
+                    <img
+                      src={profile?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${profile?.prenom} ${profile?.nom}`}
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full ring-2 ring-slate-100 group-hover:ring-brand-turquoise transition-all bg-slate-50 object-cover"
+                    />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <ChevronDown size={14} className="text-slate-400" />
+                </Link>
+              </>
+            )}
           </div>
         </header>
 
