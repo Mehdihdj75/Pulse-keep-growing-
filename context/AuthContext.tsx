@@ -45,9 +45,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         await fetchProfile(session.user.id);
-      } else if (!localStorage.getItem('pulse_demo_user')) {
-        setLoading(false);
       } else {
+        // Auto-login logic for MVP: Always default to Demo Admin if not logged in
+        if (!localStorage.getItem('pulse_demo_user')) {
+          console.log("Mode MVP: Auto-login as Demo Admin");
+          const defaultUser = DEMO_PROFILES.ADMIN;
+          localStorage.setItem('pulse_demo_user', JSON.stringify(defaultUser));
+          setProfile(defaultUser);
+        }
         setLoading(false);
       }
     };
@@ -59,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .select('*')
           .eq('id', userId)
           .single();
-        
+
         if (!error && data) {
           setProfile(data);
         }
@@ -76,7 +81,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (session?.user) {
         fetchProfile(session.user.id);
       } else if (!localStorage.getItem('pulse_demo_user')) {
-        setProfile(null);
+        // Auto-login fallback in listener
+        console.log("Mode MVP listener: Auto-login as Demo Admin");
+        const defaultUser = DEMO_PROFILES.ADMIN;
+        localStorage.setItem('pulse_demo_user', JSON.stringify(defaultUser));
+        setProfile(defaultUser);
         setLoading(false);
       }
     });
