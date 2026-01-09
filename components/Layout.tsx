@@ -71,10 +71,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const filteredItems = navItems.filter(item => {
     if (!profile || !item.roles.includes(profile.role)) return false;
 
-    // Logic for INDIVIDUEL: Hide "Nouveau Diagnostic" and "Mes Résultats" if no diagnosis completed
-    if (profile.role === 'INDIVIDUEL' && (item.path === '/diagnostic/start' || item.path === '/diagnostics')) {
-      return diagnosticCount > 0;
-    }
+    // Logic for INDIVIDUEL: Keep it simple for MVP - show all relevant items
+    // if (profile.role === 'INDIVIDUEL' && (item.path === '/diagnostic/start' || item.path === '/diagnostics')) {
+    //   return diagnosticCount > 0;
+    // }
 
     return true;
   });

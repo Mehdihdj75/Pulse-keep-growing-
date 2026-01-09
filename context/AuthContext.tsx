@@ -29,6 +29,14 @@ const DEMO_PROFILES: Record<string, Profile> = {
     role: 'DIRECTEUR',
     entreprise_id: 'ent-1',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop'
+  },
+  INDIVIDUEL: {
+    id: 'demo-ind',
+    prenom: 'Invité',
+    nom: 'Utilisateur',
+    email: 'invite@demo.com',
+    role: 'INDIVIDUEL',
+    avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Invité'
   }
 };
 
@@ -47,9 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await fetchProfile(session.user.id);
       } else {
         // Auto-login logic for MVP: Always default to Demo Admin if not logged in
+        // Auto-login logic for MVP
         if (!localStorage.getItem('pulse_demo_user')) {
-          console.log("Mode MVP: Auto-login as Demo Admin");
-          const defaultUser = DEMO_PROFILES.ADMIN;
+          // Check for admin query param
+          const params = new URLSearchParams(window.location.search);
+          const isAdmin = params.get('admin') === 'true';
+
+          console.log(isAdmin ? "Mode Admin Detected" : "Mode Public Detected");
+
+          const defaultUser = isAdmin ? DEMO_PROFILES.ADMIN : DEMO_PROFILES.INDIVIDUEL;
+
           localStorage.setItem('pulse_demo_user', JSON.stringify(defaultUser));
           setProfile(defaultUser);
         }
