@@ -5,7 +5,7 @@ import { DiagnosticReport } from '../types';
  */
 
 export const N8N_INDIVIDUAL_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/7e875dda-419b-43f9-ba61-4b88e268156f";
-export const N8N_CORP_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/eb4b6d08-10fb-47b6-9e41-46f46d281c83";
+export const N8N_CORP_WEBHOOK_URL = "https://n8n.srv864713.hstgr.cloud/webhook-test/7e875dda-419b-43f9-ba61-4b88e268156f";
 
 export interface Answer {
   section: string;
