@@ -333,8 +333,8 @@ const TakeDiagnostic: React.FC = () => {
 
                             <div className="space-y-6">
                                 {section.rubriques.flatMap((rubric) => rubric.questions).map((q, qi) => (
-                                    <div key={qi} className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4 hover:bg-white hover:shadow-md transition-all group">
-                                        <p className="text-base font-bold text-brand-midnight">{q.text}</p>
+                                    <div key={qi} className="p-6 bg-brand-midnight rounded-3xl border border-brand-midnight/5 space-y-4 hover:bg-white hover:shadow-md transition-all group duration-300">
+                                        <p className="text-base font-bold text-white group-hover:text-brand-midnight transition-colors duration-300">{q.text}</p>
 
                                         {q.type === 'scale' && (
                                             <div className="flex items-center justify-between gap-4">
