@@ -54,12 +54,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (session?.user) {
         await fetchProfile(session.user.id);
       } else {
-        // Auto-login logic for MVP: Always default to Demo Admin if not logged in
         // Auto-login logic for MVP
         if (!localStorage.getItem('pulse_demo_user')) {
-          // Check for admin query param
-          const params = new URLSearchParams(window.location.search);
-          const isAdmin = params.get('admin') === 'true';
+          // Check for admin query param (robust check anywhere in URL)
+          const isAdmin = window.location.href.includes('admin=true');
 
           console.log(isAdmin ? "Mode Admin Detected" : "Mode Public Detected");
 
@@ -97,8 +95,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchProfile(session.user.id);
       } else if (!localStorage.getItem('pulse_demo_user')) {
         // Auto-login fallback in listener
-        console.log("Mode MVP listener: Auto-login as Demo Admin");
-        const defaultUser = DEMO_PROFILES.ADMIN;
+        const isAdmin = window.location.href.includes('admin=true');
+        console.log("Mode MVP listener: Auto-login as " + (isAdmin ? "Admin" : "Public"));
+
+        const defaultUser = isAdmin ? DEMO_PROFILES.ADMIN : DEMO_PROFILES.INDIVIDUEL;
+
         localStorage.setItem('pulse_demo_user', JSON.stringify(defaultUser));
         setProfile(defaultUser);
         setLoading(false);
