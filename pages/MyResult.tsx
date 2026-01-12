@@ -354,8 +354,9 @@ const MyResult: React.FC = () => {
                 <HeaderCard
                     meta={{
                         ...finalReportData.meta,
-                        prenom: (finalReportData.meta?.prenom === 'Utilisateur' || !finalReportData.meta?.prenom) && profile?.prenom ? profile.prenom : finalReportData.meta?.prenom,
-                        nom: (finalReportData.meta?.nom === '' || !finalReportData.meta?.nom) && profile?.nom ? profile.nom : finalReportData.meta?.nom
+                        prenom: ((finalReportData.meta?.prenom === 'Utilisateur' || !finalReportData.meta?.prenom) && profile?.prenom ? profile.prenom : finalReportData.meta?.prenom)?.replace(/Utilisateur/i, '').trim(),
+                        nom: ((finalReportData.meta?.nom === '' || !finalReportData.meta?.nom) && profile?.nom ? profile.nom : finalReportData.meta?.nom)?.replace(/Utilisateur/i, '').trim(),
+                        user_id: finalReportData.meta?.user_id === 'invite@demo.com' ? 'invite@keepgrowing.fr' : (finalReportData.meta?.user_id || 'invite@keepgrowing.fr')
                     }}
                     scores={finalReportData.scores || { global_score: 0, global_score_pct: 0, global_niveau: "-", sections: [] }}
                 />
@@ -389,9 +390,10 @@ const MyResult: React.FC = () => {
                     meta: {
                         ...finalReportData.meta,
                         // Ensure we use the latest profile name if available
-                        prenom: profile?.prenom || finalReportData.meta?.prenom || 'Utilisateur',
-                        nom: profile?.nom || finalReportData.meta?.nom || '',
-                        role: profile?.role || finalReportData.meta?.role || 'Individuel'
+                        prenom: (profile?.prenom || finalReportData.meta?.prenom || 'Utilisateur').replace(/Utilisateur/i, '').trim(),
+                        nom: (profile?.nom || finalReportData.meta?.nom || '').replace(/Utilisateur/i, '').trim(),
+                        role: profile?.role || finalReportData.meta?.role || 'Individuel',
+                        user_id: finalReportData.meta?.user_id === 'invite@demo.com' ? 'invite@keepgrowing.fr' : (finalReportData.meta?.user_id || 'invite@keepgrowing.fr')
                     }
                 }} />
             </div >
