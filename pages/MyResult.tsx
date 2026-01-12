@@ -271,17 +271,26 @@ const MyResult: React.FC = () => {
         let heightLeft = imgHeight;
         let position = 0;
 
+        // Page 1
         pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
 
-        while (heightLeft >= 0) {
+        while (heightLeft > 0) {
             position = heightLeft - imgHeight;
-            pdf.addPage();
+
+            // If remaining height is less than A4, use custom page size to avoid whitespace
+            // We use a small epsilon for float comparison safety
+            if (heightLeft < pageHeight - 1) {
+                pdf.addPage([pdfWidth, heightLeft], 'p');
+            } else {
+                pdf.addPage();
+            }
+
             pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
         }
 
-        pdf.save(`Pulse_Express_${profile?.nom || 'Rapport'}.pdf`);
+        pdf.save(`Pulse_Express_${profile?.nom?.replace(/Utilisateur/i, '').trim() || 'Rapport'}.pdf`);
 
         // Hide again
         input.style.display = 'none';
