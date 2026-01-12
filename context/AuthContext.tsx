@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const DEMO_PROFILES: Record<string, Profile> = {
   ADMIN: {
-    id: 'demo-admin',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', // Valid UUID
     prenom: 'David',
     nom: 'Zaoui',
     email: 'admin@demo.com',
@@ -22,7 +22,7 @@ const DEMO_PROFILES: Record<string, Profile> = {
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop'
   },
   DIRECTEUR: {
-    id: 'demo-dir',
+    id: 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380d22', // Valid UUID
     prenom: 'Sophie',
     nom: 'Martin',
     email: 'directeur@demo.com',
@@ -31,7 +31,7 @@ const DEMO_PROFILES: Record<string, Profile> = {
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop'
   },
   INDIVIDUEL: {
-    id: 'demo-ind',
+    id: '10eebc99-9c0b-4ef8-bb6d-6bb9bd380133', // Valid UUID
     prenom: 'Invité',
     nom: 'Utilisateur',
     email: 'invite@demo.com',
