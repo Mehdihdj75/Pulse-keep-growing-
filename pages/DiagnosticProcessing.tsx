@@ -132,6 +132,24 @@ const DiagnosticProcessing: React.FC = () => {
                     </div>
                 </div>
 
+                {/* Error Overlay */}
+                {error && (
+                    <div className="absolute inset-0 bg-white/95 z-50 flex items-center justify-center p-6 animate-fade-in">
+                        <div className="text-center space-y-4 max-w-sm">
+                            <div className="text-rose-500 bg-rose-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <FileText size={24} />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-800">Petit problème technique...</h3>
+                            <p className="text-sm text-slate-500">{error}</p>
+                            <button
+                                onClick={() => navigate('/diagnostic/result', { state: location.state })}
+                                className="w-full py-3 bg-brand-turquoise text-white rounded-xl font-bold shadow-lg hover:bg-brand-turquoise-dark transition-colors"
+                            >
+                                Voir mes résultats quand même
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
