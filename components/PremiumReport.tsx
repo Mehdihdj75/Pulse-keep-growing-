@@ -127,7 +127,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                         <div>
                             <div className="header-title">Rapport de Synthèse</div>
                             <div className="header-subtitle">
-                                Utilisateur : {report.meta.prenom} {report.meta.nom} | Rôle : {report.meta.role}
+                                Utilisateur : {report.meta?.prenom} {report.meta?.nom} | Rôle : {report.meta?.role}
                             </div>
                         </div>
                     </div>
@@ -138,23 +138,27 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                     {/* SPEEDOMETER - Score Global */}
                     <div className="main-score-box">
                         <h3>Score Global</h3>
-                        <img src={getGaugeUrl(report.scores.global_score_pct, report.scores.global_color)} alt="Score" className="chart-img" />
-                        <div className="score-label-main">{report.scores.global_score.toFixed(1)} / 5 – {report.scores.global_niveau}</div>
+                        {report.scores?.global_score_pct !== undefined && (
+                            <img src={getGaugeUrl(report.scores.global_score_pct, report.scores.global_color || '#03a39b')} alt="Score" className="chart-img" />
+                        )}
+                        <div className="score-label-main">{report.scores?.global_score?.toFixed(1) || '0.0'} / 5 – {report.scores?.global_niveau || '-'}</div>
                     </div>
 
                     {/* SPIDER CHART PRINCIPAL */}
                     <div className="spider-box">
                         <h3>Spider Chart – Répartition</h3>
-                        <img src={getRadarUrl(report.scores.sections)} alt="Spider Chart" className="chart-img" />
+                        {report.scores?.sections && (
+                            <img src={getRadarUrl(report.scores.sections)} alt="Spider Chart" className="chart-img" />
+                        )}
                     </div>
 
                     {/* SCORE LIST */}
                     <div className="score-list">
                         <h4>Score par Section</h4>
-                        {report.scores.sections.map((sec, idx) => (
+                        {(report.scores?.sections || []).map((sec, idx) => (
                             <div key={idx} className="score-item">
                                 <div className="score-item-name">{sec.nom}<span className="score-item-sub">Section {idx + 1}</span></div>
-                                <span className="score-badge" style={{ background: sec.color }}>Score {sec.score.toFixed(1)}</span>
+                                <span className="score-badge" style={{ background: sec.color || '#ccc' }}>Score {sec.score?.toFixed(1) || '0.0'}</span>
                             </div>
                         ))}
                     </div>
@@ -162,8 +166,8 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
             </header>
 
             {/* SECTIONS */}
-            {report.scores.sections.map((sec, idx) => {
-                const analysisDetails = report.analyse_detaillee_par_sections.find(a => a.section_id === sec.id);
+            {(report.scores?.sections || []).map((sec, idx) => {
+                const analysisDetails = (report.analyse_detaillee_par_sections || []).find(a => a.section_id === sec.id);
                 // Try to find a recommendation for this section (simple match for now, or just generic)
                 // In a real app we'd want more robust linking between recos and sections.
                 // For now, we'll leave the general section reco separate or use the first available one as fallback??
@@ -172,7 +176,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                     <div key={sec.id} className="section-block">
                         <div className="section-header">
                             <div className="section-title">Section {idx + 1} : <span>{sec.nom}</span></div>
-                            <span className="score-badge" style={{ background: sec.color }}>Score {sec.score.toFixed(1)}</span>
+                            <span className="score-badge" style={{ background: sec.color || '#ccc' }}>Score {sec.score?.toFixed(1) || '0.0'}</span>
                         </div>
 
                         <div className="section-content">
@@ -190,7 +194,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
 
                         {/* RUBRIQUES (Themes) */}
                         <div className="rubriques-list">
-                            {analysisDetails?.themes.map((theme, tIdx) => (
+                            {(analysisDetails?.themes || []).map((theme, tIdx) => (
                                 <div key={tIdx} className="rubrique-card">
                                     <div className="rubrique-header">
                                         <div>
@@ -217,7 +221,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                     <div className="section-title">Recommandations & Plan d'Action</div>
                 </div>
                 <div className="rubriques-list">
-                    {report.recommandations_et_plan_action.map((reco, idx) => (
+                    {(report.recommandations_et_plan_action || []).map((reco, idx) => (
                         <div key={idx} className="rubrique-card">
                             <div className="rubrique-header">
                                 <div>
