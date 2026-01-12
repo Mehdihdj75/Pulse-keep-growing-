@@ -42,7 +42,7 @@ const DEMO_PROFILES: Record<string, Profile> = {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<Profile | null>(() => {
-    const saved = localStorage.getItem('pulse_demo_user');
+    const saved = localStorage.getItem('pulse_demo_user_v2');
     return saved ? JSON.parse(saved) : null;
   });
   const [loading, setLoading] = useState(true);
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await fetchProfile(session.user.id);
       } else {
         // Auto-login logic for MVP
-        if (!localStorage.getItem('pulse_demo_user')) {
+        if (!localStorage.getItem('pulse_demo_user_v2')) {
           // Check for admin query param (robust check anywhere in URL)
           const isAdmin = window.location.href.includes('admin=true');
 
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           const defaultUser = isAdmin ? DEMO_PROFILES.ADMIN : DEMO_PROFILES.INDIVIDUEL;
 
-          localStorage.setItem('pulse_demo_user', JSON.stringify(defaultUser));
+          localStorage.setItem('pulse_demo_user_v2', JSON.stringify(defaultUser));
           setProfile(defaultUser);
         }
         setLoading(false);
@@ -93,14 +93,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         fetchProfile(session.user.id);
-      } else if (!localStorage.getItem('pulse_demo_user')) {
+      } else if (!localStorage.getItem('pulse_demo_user_v2')) {
         // Auto-login fallback in listener
         const isAdmin = window.location.href.includes('admin=true');
         console.log("Mode MVP listener: Auto-login as " + (isAdmin ? "Admin" : "Public"));
 
         const defaultUser = isAdmin ? DEMO_PROFILES.ADMIN : DEMO_PROFILES.INDIVIDUEL;
 
-        localStorage.setItem('pulse_demo_user', JSON.stringify(defaultUser));
+        localStorage.setItem('pulse_demo_user_v2', JSON.stringify(defaultUser));
         setProfile(defaultUser);
         setLoading(false);
       }
@@ -110,14 +110,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signOut = async () => {
-    localStorage.removeItem('pulse_demo_user');
+    localStorage.removeItem('pulse_demo_user_v2');
     await supabase.auth.signOut();
     setProfile(null);
   };
 
   const loginAsDemo = (role: 'ADMIN' | 'DIRECTEUR' | 'MANAGER' | 'INDIVIDUEL') => {
     const demoUser = DEMO_PROFILES[role] || DEMO_PROFILES.ADMIN;
-    localStorage.setItem('pulse_demo_user', JSON.stringify(demoUser));
+    localStorage.setItem('pulse_demo_user_v2', JSON.stringify(demoUser));
     setProfile(demoUser);
   };
 
