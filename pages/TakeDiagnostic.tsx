@@ -287,7 +287,7 @@ const TakeDiagnostic: React.FC = () => {
             const { data, error: dbError } = await supabase
                 .from('diagnostics')
                 .insert([{
-                    user_id: profile.id,
+                    user_id: profile.id === '10eebc99-9c0b-4ef8-bb6d-6bb9bd380133' ? null : profile.id,
                     company_id: profile.entreprise_id,
                     questionnaire_title: DETAILED_QUESTIONNAIRE.name,
                     score: Math.round(calculateAverageScore()), // Database expects integer
