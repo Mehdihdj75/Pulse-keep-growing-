@@ -14,7 +14,8 @@ import {
   Bell,
   Search,
   ChevronDown,
-  Contact2
+  Contact2,
+  Calendar
 } from 'lucide-react';
 
 interface SidebarItemProps {
@@ -101,6 +102,16 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </nav>
 
         <div className="mt-auto border-t border-slate-800 pt-6">
+          <a
+            href="https://keepgrowing.fr/rendezvous"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 w-full rounded-xl transition-all duration-200"
+          >
+            <Calendar size={20} />
+            <span className="font-medium text-sm">Nous contacter</span>
+          </a>
+
           {profile?.role !== 'INDIVIDUEL' && (
             <button
               onClick={signOut}

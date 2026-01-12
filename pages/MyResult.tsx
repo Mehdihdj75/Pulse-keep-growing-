@@ -213,7 +213,7 @@ const MyResult: React.FC = () => {
     React.useEffect(() => {
         const interval = setInterval(() => {
             setIsCTAOpen(true);
-        }, 30000); // 30 seconds
+        }, 60000); // 1 minute
 
         return () => clearInterval(interval);
     }, []);
