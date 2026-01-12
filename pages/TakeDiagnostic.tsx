@@ -280,39 +280,29 @@ const TakeDiagnostic: React.FC = () => {
 
             const payload = buildN8NPayload(fullName, profile.email, payloadAnswers);
 
-            // 3. Send to n8n
-            const n8nResult = await sendToN8N(payload, profile); // Capture response
+            // 3. Calculate score locally
+            const calculatedScore = Math.round(calculateAverageScore());
 
-            // 4. Save to Supabase (only numeric score stored for Dashboard avg)
-            const { data, error: dbError } = await supabase
-                .from('diagnostics')
-                .insert([{
-                    user_id: profile.id === '10eebc99-9c0b-4ef8-bb6d-6bb9bd380133' ? null : profile.id,
-                    company_id: profile.entreprise_id,
-                    questionnaire_title: DETAILED_QUESTIONNAIRE.name,
-                    score: Math.round(calculateAverageScore()), // Database expects integer
-                    status: 'Terminé',
-                    trend: 'stable',
-                    team_name: 'Personnel'
-                }])
-                .select()
-                .single();
-
-            if (dbError) throw dbError;
-
-            // 5. Redirect to processing with data
+            // 4. Navigate immediately to processing page
             navigate('/diagnostic/processing', {
                 state: {
-                    result: n8nResult,
-                    answers: answers,
-                    diagnosticId: data?.id
+                    toProcess: true,
+                    n8nPayload: payload,
+                    profile,
+                    answers,
+                    meta: {
+                        score: calculatedScore,
+                        company_id: profile.entreprise_id,
+                        user_id: profile.id === '10eebc99-9c0b-4ef8-bb6d-6bb9bd380133' ? null : profile.id,
+                        questionnaire_title: DETAILED_QUESTIONNAIRE.name,
+                        team_name: 'Personnel'
+                    }
                 }
             });
 
         } catch (err: any) {
             console.error(err);
-            setError(err.message || "Erreur d'enregistrement");
-        } finally {
+            setError("Erreur lors de la préparation de l'envoi.");
             setLoading(false);
         }
     };

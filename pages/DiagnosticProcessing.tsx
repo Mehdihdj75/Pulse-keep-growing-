@@ -5,30 +5,86 @@ import { Loader2, FileText, CheckCircle2 } from 'lucide-react';
 const DiagnosticProcessing: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState(0);
-    const DURATION_MS = 30000; // 30 seconds
+    const DURATION_MS = 15000; // Faster estimated time
     const INTERVAL_MS = 100;
 
     useEffect(() => {
+        const { state } = location;
+
+        // If simply viewing animation without processing needed
+        if (!state?.toProcess) {
+            // ... existing fallback ...
+            if (state?.result) {
+                setTimeout(() => navigate('/diagnostic/result', { state }), 2000);
+            }
+            return;
+        }
+
+        let isMounted = true;
         const startTime = Date.now();
 
+        // 1. Start discrete progress animation
         const interval = setInterval(() => {
             const elapsed = Date.now() - startTime;
-            const newProgress = Math.min((elapsed / DURATION_MS) * 100, 100);
-
-            setProgress(newProgress);
-
-            if (newProgress >= 100) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    // Forward the state received from TakeDiagnostic to MyResult
-                    navigate('/diagnostic/result', { state: location.state });
-                }, 1000); // Short delay at 100% before redirect
-            }
+            // Cap at 90% until actual completion
+            setProgress(prev => Math.min(prev + (100 / (DURATION_MS / INTERVAL_MS)), 90));
         }, INTERVAL_MS);
 
-        return () => clearInterval(interval);
-    }, [navigate, location.state]);
+        // 2. Perform async operations
+        const process = async () => {
+            try {
+                // Import dynamically or assume imports exist in file
+                const { sendToN8N } = await import('../services/n8nService');
+                const { supabase } = await import('../lib/supabase');
+
+                const { n8nPayload, profile, meta } = state;
+
+                console.log("Processing submission...", meta);
+
+                // Parallel execution for speed
+                const [n8nResult, dbResult] = await Promise.all([
+                    sendToN8N(n8nPayload, profile).catch(e => {
+                        console.error("N8N Error", e);
+                        return null; // Don't block DB save if N8N fails
+                    }),
+                    supabase.from('diagnostics').insert([{
+                        ...meta,
+                        status: 'Terminé',
+                        trend: 'stable',
+                        created_at: new Date().toISOString()
+                    }]).select().single()
+                ]);
+
+                if (isMounted) {
+                    clearInterval(interval);
+                    setProgress(100);
+
+                    setTimeout(() => {
+                        navigate('/diagnostic/result', {
+                            state: {
+                                result: n8nResult,
+                                answers: state.answers,
+                                diagnosticId: dbResult.data?.id
+                            }
+                        });
+                    }, 800);
+                }
+
+            } catch (err: any) {
+                console.error("Processing Error", err);
+                if (isMounted) setError("Une erreur est survenue lors du traitement.");
+            }
+        };
+
+        process();
+
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
+    }, [navigate, location]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-brand-soft-bg p-4">
