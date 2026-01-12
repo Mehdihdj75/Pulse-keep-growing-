@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { CustomSelect } from '../components/CustomSelect';
 
 // Nouveaux types pour le questionnaire flexible
-type QuestionType = 'scale' | 'select' | 'multiselect';
+type QuestionType = 'scale' | 'select' | 'multiselect' | 'text';
 
 interface QuestionDef {
     code: string;
@@ -30,6 +30,28 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
     id: 'Pulse-Sales-v2',
     name: 'Diagnostic Commercial Pulse',
     sections: [
+        {
+            titre: "0. Vos Coordonnées",
+            rubriques: [
+                {
+                    titre: "Identité",
+                    questions: [
+                        {
+                            code: "prenom",
+                            text: "Votre Prénom *",
+                            type: "text",
+                            options: []
+                        },
+                        {
+                            code: "nom",
+                            text: "Votre Nom *",
+                            type: "text",
+                            options: []
+                        }
+                    ]
+                }
+            ]
+        },
         {
             titre: "1. Votre Entreprise & Contexte",
             rubriques: [
@@ -251,7 +273,12 @@ const TakeDiagnostic: React.FC = () => {
             }));
 
             // 2. n8n payload
-            const payload = buildN8NPayload(`${profile.prenom} ${profile.nom}`, profile.email, payloadAnswers);
+            // Use answers for name if provided (new behavior), fallback to profile
+            const firstName = answers['prenom'] || profile.prenom || 'Utilisateur';
+            const lastName = answers['nom'] || profile.nom || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+
+            const payload = buildN8NPayload(fullName, profile.email, payloadAnswers);
 
             // 3. Send to n8n
             const n8nResult = await sendToN8N(payload, profile); // Capture response
@@ -389,6 +416,16 @@ const TakeDiagnostic: React.FC = () => {
                                                     );
                                                 })}
                                             </div>
+                                        )}
+
+                                        {q.type === 'text' && (
+                                            <input
+                                                type="text"
+                                                value={answers[q.code] || ''}
+                                                onChange={(e) => handleAnswerChange(q.code, e.target.value)}
+                                                placeholder="Tapez votre réponse ici..."
+                                                className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-brand-midnight focus:ring-4 focus:ring-brand-turquoise/10 outline-none text-base"
+                                            />
                                         )}
                                     </div>
                                 ))}
