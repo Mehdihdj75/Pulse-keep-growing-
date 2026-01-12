@@ -31,7 +31,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
     name: 'Diagnostic Commercial Pulse',
     sections: [
         {
-            titre: "0. Vos Coordonnées",
+            titre: "1. Vos Coordonnées",
             rubriques: [
                 {
                     titre: "Identité",
@@ -53,7 +53,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "1. Votre Entreprise & Contexte",
+            titre: "2. Votre Entreprise & Contexte",
             rubriques: [
                 {
                     titre: "Profil",
@@ -97,7 +97,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "2. Vision & Formalisation",
+            titre: "3. Vision & Formalisation",
             rubriques: [
                 {
                     titre: "Clarté du Cycle",
@@ -110,7 +110,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "3. Utilisation du CRM",
+            titre: "4. Utilisation du CRM",
             rubriques: [
                 {
                     titre: "Fiabilité",
@@ -123,7 +123,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "4. Discipline & Suivi",
+            titre: "5. Discipline & Suivi",
             rubriques: [
                 {
                     titre: "Rigueur",
@@ -136,7 +136,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "5. Rituels & Alignement",
+            titre: "6. Rituels & Alignement",
             rubriques: [
                 {
                     titre: "Management",
@@ -149,7 +149,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "6. Qualité & Prise de décision",
+            titre: "7. Qualité & Prise de décision",
             rubriques: [
                 {
                     titre: "Data Driven",
@@ -162,7 +162,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "7. Appropriation & Responsabilité",
+            titre: "8. Appropriation & Responsabilité",
             rubriques: [
                 {
                     titre: "Engagement équipe",
@@ -175,7 +175,7 @@ const DETAILED_QUESTIONNAIRE: { id: string; name: string; sections: SectionDef[]
             ]
         },
         {
-            titre: "8. Symptômes & Risques",
+            titre: "9. Symptômes & Risques",
             rubriques: [
                 {
                     titre: "Santé du business",
@@ -350,8 +350,8 @@ const TakeDiagnostic: React.FC = () => {
 
                             <div className="space-y-6">
                                 {section.rubriques.flatMap((rubric) => rubric.questions).map((q, qi) => (
-                                    <div key={qi} className="p-6 bg-brand-midnight rounded-3xl border border-brand-midnight/5 space-y-4 hover:bg-white hover:shadow-md transition-all group duration-300">
-                                        <p className="text-base font-bold text-white group-hover:text-brand-midnight transition-colors duration-300">{q.text}</p>
+                                    <div key={qi} className="p-6 bg-brand-midnight rounded-3xl border border-brand-midnight/5 space-y-4 transition-all group duration-300">
+                                        <p className="text-base font-bold text-white transition-colors duration-300">{q.text}</p>
 
                                         {q.type === 'scale' && (
                                             <div className="flex items-center justify-between gap-4">
