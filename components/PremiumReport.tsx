@@ -69,7 +69,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
 
     const styles = `
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-    .premium-report-root { --bg:#0a0f1a;--bg-card:#111827;--bg-section:#1a2332;--bg-rubrique:#0d1219;--primary:#03a39b;--primary-light:rgba(3,163,155,0.15);--text:#f1f5f9;--text-soft:#94a3b8;--text-muted:#64748b;--border:rgba(255,255,255,0.08);--success:#10b981;--warning:#f59e0b;--danger:#ef6355; font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding:32px; width: 1100px; margin: 0 auto; }
+    .premium-report-root { --bg:#0a0f1a;--bg-card:#111827;--bg-section:#1a2332;--bg-rubrique:#0d1219;--primary:#03a39b;--primary-light:rgba(3,163,155,0.15);--text:#f1f5f9;--text-soft:#94a3b8;--text-muted:#64748b;--border:rgba(255,255,255,0.08);--success:#10b981;--warning:#f59e0b;--danger:#ef6355; font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding:32px; padding-bottom: 1px; width: 1100px; margin: 0 auto; }
     .premium-report-root * { box-sizing:border-box;margin:0;padding:0; }
     .premium-report-root .report-header{background:var(--bg-card);border-radius:16px;padding:28px 32px;margin-bottom:24px;border:1px solid var(--border);}
     .premium-report-root .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
@@ -91,12 +91,12 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     .premium-report-root .score-item:last-child{border-bottom:none;}
     .premium-report-root .score-item-name{font-size:12px;color:var(--text);flex:1;padding-right:12px;}
     .premium-report-root .score-item-sub{font-size:10px;color:var(--text-muted);display:block;}
-    .premium-report-root .score-badge{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;}
+    .premium-report-root .score-badge{display: inline-flex; align-items: center; justify-content: center; height: 24px; padding:0 12px; border-radius:6px; font-size:11px; font-weight:600; color:#fff; white-space:nowrap; vertical-align: middle; line-height: 1;}
     .premium-report-root .section-block{background:var(--bg-card);border-radius:16px;margin-bottom:24px;border:1px solid var(--border);overflow:hidden; page-break-inside: avoid;}
     .premium-report-root .section-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:var(--bg-section);border-bottom:1px solid var(--border);}
     .premium-report-root .section-title{font-size:15px;font-weight:600;color:var(--primary);}
     .premium-report-root .section-title span{color:var(--text);}
-    .premium-report-root .section-content{display:grid;grid-template-columns:1fr;gap:24px;padding:24px;} /* Removed right col chart for now as we don't have sub-charts */
+    .premium-report-root .section-content{display:grid;grid-template-columns:1fr;gap:24px;padding:24px;}
     .premium-report-root .section-analysis h4{font-size:12px;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;}
     .premium-report-root .section-analysis p{font-size:14px;color:var(--text-soft);line-height:1.6;margin-bottom:16px;}
     .premium-report-root .section-reco{background:var(--primary-light);border-radius:8px;padding:12px 14px;border-left:3px solid var(--primary);}
@@ -112,8 +112,13 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     .premium-report-root .rubrique-body{margin-top:12px;}
     .premium-report-root .rubrique-analysis h5{font-size:11px;color:var(--primary);text-transform:uppercase;margin-bottom:6px;}
     .premium-report-root .rubrique-analysis p{font-size:13px;color:var(--text-soft);margin-bottom:12px;}
-    .premium-report-root .report-footer{text-align:center;padding:24px;color:var(--text-muted);font-size:12px;}
+    .premium-report-root .report-footer{text-align:center;padding:24px; padding-bottom: 0px; margin-bottom: 0px; color:var(--text-muted);font-size:10px; opacity: 0.6;}
     `;
+
+    // Filter out "Coordonnées" sections for the report
+    const filteredSections = (report.scores?.sections || []).filter(sec =>
+        !sec.nom.toLowerCase().includes('coordonnées')
+    );
 
     return (
         <div id="premium-report-content" className="premium-report-root">
@@ -147,16 +152,19 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                     {/* SPIDER CHART PRINCIPAL */}
                     <div className="spider-box">
                         <h3>Spider Chart – Répartition</h3>
-                        {report.scores?.sections && (
-                            <img src={getRadarUrl(report.scores.sections)} alt="Spider Chart" className="chart-img" />
+                        {/* Use filtered sections for the chart too if appropriate, but usually spider includes all. 
+                            However, Coordonnées probably has no score. If it does, keep it? 
+                            Assuming Coordonnées has score 0 or is irrelevant, filtering is safer visually. */}
+                        {filteredSections.length > 0 && (
+                            <img src={getRadarUrl(filteredSections)} alt="Spider Chart" className="chart-img" />
                         )}
                     </div>
 
                     {/* SCORE LIST */}
                     <div className="score-list">
                         <h4>Score par Section</h4>
-                        {(report.scores?.sections || []).map((sec, idx) => (
-                            <div key={idx} className="score-item">
+                        {filteredSections.map((sec, idx) => (
+                            <div key={sec.id || idx} className="score-item">
                                 <div className="score-item-name">{sec.nom}<span className="score-item-sub">Section {idx + 1}</span></div>
                                 <span className="score-badge" style={{ background: sec.color || '#ccc' }}>Score {sec.score?.toFixed(1) || '0.0'}</span>
                             </div>
@@ -166,14 +174,10 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
             </header>
 
             {/* SECTIONS */}
-            {(report.scores?.sections || []).map((sec, idx) => {
+            {filteredSections.map((sec, idx) => {
                 const analysisDetails = (report.analyse_detaillee_par_sections || []).find(a => a.section_id === sec.id);
-                // Try to find a recommendation for this section (simple match for now, or just generic)
-                // In a real app we'd want more robust linking between recos and sections.
-                // For now, we'll leave the general section reco separate or use the first available one as fallback??
-                // Use the new structure: Themes -> Rubriques
                 return (
-                    <div key={sec.id} className="section-block">
+                    <div key={sec.id || idx} className="section-block">
                         <div className="section-header">
                             <div className="section-title">Section {idx + 1} : <span>{sec.nom}</span></div>
                             <span className="score-badge" style={{ background: sec.color || '#ccc' }}>Score {sec.score?.toFixed(1) || '0.0'}</span>
@@ -183,7 +187,6 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                             <div className="section-analysis">
                                 <h4>Analyse de la section</h4>
                                 <p>
-                                    {/* Using synthesis parts if available or generic text */}
                                     Score de {sec.score_pct}% - {sec.niveau}.
                                     {sec.niveau === 'Excellent' ? ' Excellent travail, une référence pour l\'équipe.' :
                                         sec.niveau === 'Solide' ? ' De bonnes bases, quelques ajustements possibles.' :
@@ -215,7 +218,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                 );
             })}
 
-            {/* RECOMMENDATIONS SECTION (Added as a final block since it's global in current data) */}
+            {/* RECOMMENDATIONS SECTION */}
             <div className="section-block">
                 <div className="section-header">
                     <div className="section-title">Recommandations & Plan d'Action</div>
