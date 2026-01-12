@@ -361,16 +361,10 @@ const MyResult: React.FC = () => {
                 {/* 4. Recommendations */}
                 <RecommendationsCard recos={finalReportData.recommandations_et_plan_action || []} />
 
-                {/* 5. Conclusion */}
-                <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8">
-                    <h2 className="text-lg font-bold text-brand-midnight mb-2">4. Conclusion</h2>
-                    <p className="text-sm text-slate-500 leading-relaxed">
-                        {finalReportData.conclusion}
-                    </p>
-                </div>
+
 
                 <div className="text-center text-xs text-slate-400 mt-8">
-                    Rapport généré automatiquement par votre workflow Pulse+ IA.
+                    Rapport généré par Pulse Express.
                 </div>
             </div>
 
