@@ -299,11 +299,32 @@ const MyResult: React.FC = () => {
     // Validation: Check for a key property like 'scores'
     const hasValidData = reportData && reportData.scores;
 
-    // Final data to use (Mock if invalid)
-    const finalReportData = hasValidData ? reportData : MOCK_REPORT_DATA;
+    // IF NO DATA (and not loading) -> Show "No Result" state
+    if (!hasValidData && !loading) {
+        return (
+            <div className="min-h-screen bg-brand-soft-bg p-8 flex flex-col items-center justify-center animate-fade-in text-center space-y-6">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
+                    <LayoutDashboard size={40} />
+                </div>
+                <h2 className="text-2xl font-bold text-brand-midnight">Aucun résultat disponible</h2>
+                <p className="text-slate-500 max-w-md">
+                    Les résultats sont éphémères pour des raisons de sécurité.
+                    Si vous avez rechargé la page, vos résultats ont été effacés.
+                </p>
+                <Link
+                    to="/diagnostic/start"
+                    className="px-6 py-3 bg-brand-turquoise text-white rounded-xl font-bold hover:bg-brand-turquoise-dark transition-colors shadow-lg shadow-brand-turquoise/20"
+                >
+                    Nouveau Diagnostic
+                </Link>
+            </div>
+        );
+    }
 
-    // Warning banner if using mock data
-    const isMock = !hasValidData;
+    // Final data to use
+    // Final data to use
+    const finalReportData = reportData;
+    const isMock = false; // Mock disabled
 
     return (
         <div className="min-h-screen bg-brand-soft-bg p-4 md:p-8 lg:p-12 animate-fade-in font-sans">
@@ -328,13 +349,6 @@ const MyResult: React.FC = () => {
                         <span>Télécharger le PDF</span>
                     </button>
                 </div>
-
-                {isMock && (
-                    <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl flex items-center gap-3 text-sm">
-                        <AlertTriangle size={18} />
-                        <span>Mode démonstration : Affichage de données fictives car le diagnostic n'est pas encore connecté à la nouvelle structure de données.</span>
-                    </div>
-                )}
 
                 {/* 1. Header Card - Use profile name if meta is generic */}
                 <HeaderCard
@@ -366,10 +380,10 @@ const MyResult: React.FC = () => {
                 <div className="text-center text-xs text-slate-400 mt-8">
                     Rapport généré par Pulse Express.
                 </div>
-            </div>
+            </div >
 
             {/* Hidden container for PDF generation */}
-            <div style={{ position: 'absolute', top: -10000, left: -10000, overflow: 'hidden' }}>
+            < div style={{ position: 'absolute', top: -10000, left: -10000, overflow: 'hidden' }}>
                 <PremiumReport report={{
                     ...finalReportData,
                     meta: {
@@ -380,10 +394,10 @@ const MyResult: React.FC = () => {
                         role: profile?.role || finalReportData.meta?.role || 'Individuel'
                     }
                 }} />
-            </div>
+            </div >
 
             <CallToActionModal isOpen={isCTAOpen} onClose={() => setIsCTAOpen(false)} />
-        </div>
+        </div >
     );
 };
 
