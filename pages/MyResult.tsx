@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Download, AlertTriangle, LayoutDashboard } from 'lucide-react';
 import PremiumReport from '../components/PremiumReport';
+import { CallToActionModal } from '../components/CallToActionModal';
 
 import { DiagnosticReport, DiagnosticMeta, DiagnosticScores, DiagnosticSynthesis, SectionAnalysis, ActionPlanItem, SectionScore } from '../types';
 import jsPDF from 'jspdf';
@@ -206,6 +207,17 @@ const MyResult: React.FC = () => {
     const [dbReport, setDbReport] = React.useState<DiagnosticReport | null>(null);
     const [loading, setLoading] = React.useState(false);
 
+    const [isCTAOpen, setIsCTAOpen] = React.useState(false);
+
+    // CTA Modal Timer - Every 30 seconds
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setIsCTAOpen(true);
+        }, 30000); // 30 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
     // Fetch from DB if no state (e.g. direct link or history)
     // Note: We might want to use a query param or URL param :id
     React.useEffect(() => {
@@ -375,6 +387,8 @@ const MyResult: React.FC = () => {
                     }
                 }} />
             </div>
+
+            <CallToActionModal isOpen={isCTAOpen} onClose={() => setIsCTAOpen(false)} />
         </div>
     );
 };
