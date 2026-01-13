@@ -413,7 +413,13 @@ const MyResult: React.FC = () => {
                                 <h3 className="font-bold text-lg mb-2">Votre rapport complet</h3>
                                 <p className="text-sm text-slate-300 mb-6">Téléchargez la version PDF détaillée de votre diagnostic commercial.</p>
                                 <button
-                                    onClick={handleDownloadPDF}
+                                    onClick={() => {
+                                        if (isEphemeral) {
+                                            setShowCTAModal(true);
+                                        } else {
+                                            handleDownloadPDF();
+                                        }
+                                    }}
                                     className="w-full py-3 bg-[#03a39b] hover:bg-[#02847e] text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                                 >
                                     Télécharger le PDF
@@ -422,24 +428,8 @@ const MyResult: React.FC = () => {
                         </div>
 
                         <div className="lg:col-span-2 space-y-8">
-                            {/* DETAILED ANALYSIS with BLUR if Ephemeral */}
-                            <div className="relative">
-                                <div className={isEphemeral ? "filter blur-sm select-none pointer-events-none opacity-60" : ""}>
-                                    <DetailedAnalysisCard analyses={resultData.analyse_detaillee_par_sections || []} sections={resultData.scores?.sections || []} />
-                                </div>
-                                {isEphemeral && (
-                                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center">
-                                        <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-white/50 max-w-md">
-                                            <Lock className="w-12 h-12 text-[#03a39b] mx-auto mb-4" />
-                                            <h3 className="text-xl font-bold text-[#0f172a] mb-2">Débloquez votre analyse détaillée</h3>
-                                            <p className="text-slate-600 mb-6">Accédez aux détails complets de votre performance par section et comparez-vous au marché.</p>
-                                            <button onClick={() => setShowCTAModal(true)} className="px-8 py-3 bg-[#03a39b] hover:bg-[#02847e] text-white font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5">
-                                                Voir mon analyse complète
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            {/* DETAILED ANALYSIS - ALWAYS VISIBLE (No Blur) */}
+                            <DetailedAnalysisCard analyses={resultData.analyse_detaillee_par_sections || []} sections={resultData.scores?.sections || []} />
 
                             {/* RECOMMENDATIONS with BLUR if Ephemeral */}
                             <div className="relative">
@@ -499,13 +489,21 @@ const MyResult: React.FC = () => {
                                 Votre diagnostic est prêt ! Entrez votre email pour recevoir votre rapport PDF complet et accéder à votre espace personnel.
                             </p>
 
-                            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); /* Handle signup/login redirect here */ navigate('/signup'); }}>
+                            <form className="space-y-4" onSubmit={(e) => {
+                                e.preventDefault();
+                                // Unlock the report
+                                setIsEphemeral(false);
+                                setShowCTAModal(false);
+                                // Optionally trigger PDF download automatically
+                                setTimeout(() => handleDownloadPDF(), 500);
+                            }}>
                                 <div>
                                     <input
                                         type="email"
                                         placeholder="votre@email.com"
                                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#03a39b] focus:border-transparent outline-none transition-all font-medium text-[#0f172a] placeholder:text-slate-400"
                                         autoFocus
+                                        required
                                     />
                                 </div>
                                 <button type="submit" className="w-full py-4 bg-[#03a39b] hover:bg-[#02847e] text-white text-lg font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5">
