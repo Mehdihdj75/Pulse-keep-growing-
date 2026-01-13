@@ -110,41 +110,59 @@ const HeaderCard = ({ report, scoreColor }: { report: DiagnosticReport, scoreCol
     );
 };
 
-const SynthesisCard = ({ synthese }: { synthese: DiagnosticSynthesis }) => (
-    <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-100">
-        <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
-            <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm font-bold">1</span>
-            Synthèse Exécutive
-        </h2>
+const SynthesisCard = ({ synthese }: { synthese: DiagnosticSynthesis }) => {
+    // Debug log to check incoming data
+    console.log("Synthesis Data:", synthese);
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1 border border-emerald-100 bg-emerald-50/50 rounded-xl p-5">
-                <h3 className="font-bold text-emerald-800 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
-                    Forces principales
-                </h3>
-                <p className="text-sm text-emerald-900/80 leading-relaxed">
-                    {synthese.forces_principales || "Vos points forts seront affichés ici une fois le diagnostic complété."}
-                </p>
-            </div>
+    return (
+        <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-100">
+            <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm font-bold">1</span>
+                Synthèse Exécutive
+            </h2>
 
-            <div className="md:col-span-1 border border-amber-100 bg-amber-50/50 rounded-xl p-5">
-                <h3 className="font-bold text-amber-800 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
-                    Axes de vigilance
-                </h3>
-                <p className="text-sm text-amber-900/80 leading-relaxed">
-                    {synthese.axes_de_vigilance || "Vos axes d'amélioration seront affichés ici une fois le diagnostic complété."}
-                </p>
-            </div>
+            <div className="space-y-6">
+                {/* Row 1: Forces & Vigilance */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="border border-emerald-100 bg-emerald-50/50 rounded-xl p-6">
+                        <h3 className="font-bold text-emerald-800 mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4" />
+                            Forces principales
+                        </h3>
+                        <div className="text-sm text-emerald-900/80 leading-relaxed whitespace-pre-line">
+                            {synthese.forces_principales && synthese.forces_principales.length > 5
+                                ? synthese.forces_principales
+                                : <span className="italic opacity-60">Analyse des forces en cours... (Données non disponibles)</span>}
+                        </div>
+                    </div>
 
-            <div className="md:col-span-1 bg-slate-50 rounded-xl p-5 border border-slate-100">
-                <h3 className="font-bold text-slate-700 mb-2 text-sm uppercase tracking-wide">Lecture générale</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                    {synthese.resume_global || "La synthèse globale de votre performance commerciale."}
-                </p>
+                    <div className="border border-amber-100 bg-amber-50/50 rounded-xl p-6">
+                        <h3 className="font-bold text-amber-800 mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4" />
+                            Axes de vigilance
+                        </h3>
+                        <div className="text-sm text-amber-900/80 leading-relaxed whitespace-pre-line">
+                            {synthese.axes_de_vigilance && synthese.axes_de_vigilance.length > 5
+                                ? synthese.axes_de_vigilance
+                                : <span className="italic opacity-60">Identification des axes d'amélioration... (Données non disponibles)</span>}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Row 2: General Analysis */}
+                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                    <h3 className="font-bold text-slate-700 mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
+                        <LayoutDashboard className="w-4 h-4" />
+                        Lecture générale
+                    </h3>
+                    <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                        {synthese.resume_global || "La synthèse globale de votre performance commerciale sera disponible une fois le traitement terminé."}
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const DetailedAnalysisCard: React.FC<{ analyses: SectionAnalysis[], sections: SectionScore[] }> = ({ analyses, sections }) => (
     <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8 space-y-8 relative overflow-hidden">
