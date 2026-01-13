@@ -8,11 +8,17 @@ interface PremiumReportProps {
 
 const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     // Helper to get color based on score or default
-    const getScoreColor = (scorePct: number) => {
-        if (scorePct >= 75) return '#10b981'; // Success
-        if (scorePct >= 50) return '#03a39b'; // Primary
-        if (scorePct >= 25) return '#f59e0b'; // Warning
-        return '#ef6355'; // Danger
+    const getScoreColor = (score: number, level?: string): string => {
+        const lvl = level?.toLowerCase() || '';
+        if (lvl.includes('excellent')) return '#10b981'; // Green-500
+        if (lvl.includes('solide')) return '#059669';   // Emerald-600
+        if (lvl.includes('fragile')) return '#f59e0b';  // Amber-500
+        if (lvl.includes('critique') || lvl.includes('vulnérable')) return '#ef4444'; // Red-500
+        // Fallback based on score if no level text
+        if (score >= 4.5) return '#10b981';
+        if (score >= 3.5) return '#059669';
+        if (score >= 2.5) return '#f59e0b';
+        return '#ef4444';
     };
 
     // Construct QuickChart URLs
@@ -121,96 +127,117 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     );
 
     return (
-        <div id="premium-report-content" className="premium-report-root">
+        <div id="premium-report-content" className="premium-report-root" style={{
+            width: '210mm',
+            minHeight: '297mm',
+            padding: '40px',
+            backgroundColor: 'white',
+            fontFamily: 'Inter, sans-serif',
+            color: '#1e293b',
+            position: 'relative'
+        }}>
             <style>{styles}</style>
 
-            {/* HEADER */}
-            <header className="report-header">
-                <div className="header-top">
-                    <div className="header-left">
-                        <svg className="logo" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#03a39b" /><text x="50%" y="54%" textAnchor="middle" fill="#fff" fontSize="14" fontWeight="700" dominantBaseline="middle">KG</text></svg>
-                        <div>
-                            <div className="header-title">Rapport de Synthèse</div>
-                            <div className="header-subtitle">
-                                Utilisateur : {report.meta?.prenom} {report.meta?.nom} | Rôle : {report.meta?.role}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="header-date">{date || new Date().toISOString().split('T')[0]}</div>
-                </div>
-
-                <div className="header-content">
-                    {/* SPEEDOMETER - Score Global */}
-                    <div className="main-score-box">
-                        <h3>Score Global</h3>
-                        {report.scores?.global_score_pct !== undefined && (
-                            <img src={getGaugeUrl(report.scores.global_score_pct, report.scores.global_color || '#03a39b')} alt="Score" className="chart-img" />
-                        )}
-                        <div className="score-label-main">{report.scores?.global_score?.toFixed(1) || '0.0'} / 5 – {report.scores?.global_niveau || '-'}</div>
-                    </div>
-
-                    {/* SPIDER CHART PRINCIPAL */}
-                    <div className="spider-box">
-                        <h3>Spider Chart – Répartition</h3>
-                        {/* Use filtered sections for the chart too if appropriate, but usually spider includes all. 
-                            However, Coordonnées probably has no score. If it does, keep it? 
-                            Assuming Coordonnées has score 0 or is irrelevant, filtering is safer visually. */}
-                        {filteredSections.length > 0 && (
-                            <img src={getRadarUrl(filteredSections)} alt="Spider Chart" className="chart-img" />
-                        )}
-                    </div>
-
-                    {/* SCORE LIST */}
-                    <div className="score-list">
-                        <h4>Score par Section</h4>
-                        {filteredSections.map((sec, idx) => (
-                            <div key={sec.id || idx} className="score-item">
-                                <div className="score-item-name">{sec.nom}<span className="score-item-sub">Section {idx + 1}</span></div>
-                                <span className="score-badge" style={{ background: sec.color || '#ccc' }}>Score {sec.score?.toFixed(1) || '0.0'}</span>
-                            </div>
-                        ))}
+            {/* Header */}
+            <div className="flex justify-between items-start mb-12 border-b border-slate-100 pb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-[#0f172a] mb-2">Rapport de Diagnostic Pulse+</h1>
+                    <div className="text-slate-500 text-sm">
+                        <p>Préparé pour : <span className="font-semibold text-[#0f172a]">{report.meta.prenom} {report.meta.nom}</span></p>
+                        <p>Date : {date || new Date().toLocaleDateString('fr-FR')}</p>
                     </div>
                 </div>
-            </header>
+                <div className="text-right">
+                    <div className="text-4xl font-black text-[#03a39b] mb-1">{report.scores.global_score?.toFixed(1)}<span className="text-lg text-slate-300">/5</span></div>
+                    <div className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white"
+                        style={{ backgroundColor: getScoreColor(report.scores.global_score, report.scores.global_niveau) }}>
+                        {report.scores.global_niveau}
+                    </div>
+                </div>
+            </div>
+
+            {/* Synthesis */}
+            <div className="mb-12">
+                <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">1</span>
+                    Synthèse Exécutive
+                </h2>
+                <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-sm text-slate-600 leading-relaxed shadow-sm">
+                    {report.synthese.resume_global}
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="border border-emerald-100 bg-emerald-50/50 rounded-xl p-5">
+                        <h3 className="font-bold text-emerald-800 mb-2 text-sm uppercase tracking-wide">Forces identifiées</h3>
+                        <p className="text-sm text-emerald-900/80">{report.synthese.forces_principales || "Information non disponible"}</p>
+                    </div>
+                    <div className="border border-amber-100 bg-amber-50/50 rounded-xl p-5">
+                        <h3 className="font-bold text-amber-800 mb-2 text-sm uppercase tracking-wide">Points de vigilance</h3>
+                        <p className="text-sm text-amber-900/80">{report.synthese.axes_de_vigilance || "Information non disponible"}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Scores List */}
+            <div className="mb-12">
+                <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">2</span>
+                    Détail des Scores
+                </h2>
+                <div className="space-y-3">
+                    {filteredSections.map((sec, idx) => {
+                        const color = getScoreColor(sec.score, sec.niveau);
+                        return (
+                            <div key={idx} className="flex items-center gap-4 text-sm">
+                                <div className="w-1/3 font-medium text-slate-700">{sec.nom}</div>
+                                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="h-full rounded-full" style={{ width: `${sec.score_pct}%`, backgroundColor: color }}></div>
+                                </div>
+                                <div className="score-badge" style={{ backgroundColor: color }}>
+                                    {sec.score_pct}%
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
 
             {/* SECTIONS */}
-            {filteredSections.map((sec, idx) => {
-                const analysisDetails = (report.analyse_detaillee_par_sections || []).find(a => a.section_id === sec.id);
-                return (
-                    <div key={sec.id || idx} className="section-block">
-                        <div className="section-header">
-                            <div className="section-title">Section {idx + 1} : <span>{sec.nom}</span></div>
-                            <span className="score-badge" style={{ background: sec.color || '#ccc' }}>Score {sec.score?.toFixed(1) || '0.0'}</span>
-                        </div>
+            {(report.analyse_detaillee_par_sections || []).map((analysisDetails, idx) => {
+                const sec = report.scores?.sections?.find(s => s.id === analysisDetails.section_id);
+                if (!sec || sec.nom.toLowerCase().includes('coordonnées')) return null;
 
-                        <div className="section-content">
-                            <div className="section-analysis">
-                                <h4>Analyse de la section</h4>
-                                <p>
-                                    Score de {sec.score_pct}% - {sec.niveau}.
-                                    {sec.niveau === 'Excellent' ? ' Excellent travail, une référence pour l\'équipe.' :
-                                        sec.niveau === 'Solide' ? ' De bonnes bases, quelques ajustements possibles.' :
-                                            ' Cette section nécessite une attention particulière.'}
-                                </p>
-                            </div>
+                const sectionColor = getScoreColor(sec.score, sec.niveau);
+
+                return (
+                    <div key={sec.id || idx} className="mb-12">
+                        <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+                            <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">{idx + 3}</span>
+                            {sec.nom}
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white ml-auto"
+                                style={{ backgroundColor: sectionColor }}>
+                                {sec.niveau}
+                            </span>
+                        </h2>
+                        <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-sm text-slate-600 leading-relaxed shadow-sm">
+                            {analysisDetails.resume_section}
                         </div>
 
                         {/* RUBRIQUES (Themes) */}
-                        <div className="rubriques-list">
-                            {(analysisDetails?.themes || []).map((theme, tIdx) => (
-                                <div key={tIdx} className="rubrique-card">
-                                    <div className="rubrique-header">
-                                        <div>
-                                            <div className="rubrique-num">Thème {tIdx + 1}</div>
-                                            <div className="rubrique-title">{theme.titre}</div>
+                        <div className="space-y-6">
+                            {(analysisDetails.themes || []).map((theme, tIdx) => (
+                                <div key={tIdx} className="border border-slate-100 rounded-xl p-5 bg-white shadow-sm">
+                                    <h3 className="font-bold text-[#0f172a] mb-2 text-base">{theme.titre}</h3>
+                                    <p className="text-sm text-slate-600 leading-relaxed mb-4">{theme.texte}</p>
+                                    {theme.recommandations && theme.recommandations.length > 0 && (
+                                        <div className="bg-blue-50 border-l-4 border-blue-200 p-4 text-sm text-blue-800">
+                                            <h4 className="font-semibold mb-2">Recommandations :</h4>
+                                            <ul className="list-disc pl-5 space-y-1">
+                                                {theme.recommandations.map((reco, rIdx) => (
+                                                    <li key={rIdx}>{reco}</li>
+                                                ))}
+                                            </ul>
                                         </div>
-                                    </div>
-                                    <div className="rubrique-body">
-                                        <div className="rubrique-analysis">
-                                            <h5>Analyse</h5>
-                                            <p>{theme.texte}</p>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -219,28 +246,32 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
             })}
 
             {/* RECOMMENDATIONS SECTION */}
-            <div className="section-block">
-                <div className="section-header">
-                    <div className="section-title">Recommandations & Plan d'Action</div>
-                </div>
-                <div className="rubriques-list">
+            <div className="mb-12">
+                <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">
+                        {(report.analyse_detaillee_par_sections || []).filter(sec => !report.scores?.sections?.find(s => s.id === sec.section_id)?.nom.toLowerCase().includes('coordonnées')).length + 3}
+                    </span>
+                    Recommandations Générales & Plan d'Action
+                </h2>
+                <div className="space-y-6">
                     {(report.recommandations_et_plan_action || []).map((reco, idx) => (
-                        <div key={idx} className="rubrique-card">
-                            <div className="rubrique-header">
-                                <div>
-                                    <div className="rubrique-num">Priorité {reco.priorite} - {reco.horizon}</div>
-                                    <div className="rubrique-title">{reco.titre}</div>
+                        <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-white shadow-sm">
+                            <div className="flex justify-between items-center mb-2">
+                                <h3 className="font-bold text-[#0f172a] text-base">{reco.titre}</h3>
+                                <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                    <span className="px-2 py-1 rounded-full bg-slate-100">Priorité: {reco.priorite}</span>
+                                    <span className="px-2 py-1 rounded-full bg-slate-100">Horizon: {reco.horizon}</span>
                                 </div>
                             </div>
-                            <div className="rubrique-body">
-                                <p className="text-sm text-slate-400">{reco.description}</p>
-                            </div>
+                            <p className="text-sm text-slate-600 leading-relaxed">{reco.description}</p>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <footer className="report-footer">Rapport généré par Pulse Express • {date || new Date().toISOString().split('T')[0]}</footer>
+            <footer className="text-center text-xs text-slate-400 pt-8 border-t border-slate-100">
+                Rapport généré par Pulse Express • {date || new Date().toLocaleDateString('fr-FR')}
+            </footer>
         </div>
     );
 };

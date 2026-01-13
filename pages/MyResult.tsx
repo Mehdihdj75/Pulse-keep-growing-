@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Download, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Download, AlertTriangle, LayoutDashboard, FileText, ArrowRight, X, Lock } from 'lucide-react';
 import PremiumReport from '../components/PremiumReport';
 import { CallToActionModal } from '../components/CallToActionModal';
 
@@ -63,104 +63,102 @@ const MOCK_REPORT_DATA: DiagnosticReport = {
 
 // --- COMPONENTS ---
 
-const HeaderCard: React.FC<{ meta: DiagnosticMeta, scores: DiagnosticScores }> = ({ meta, scores }) => (
-    <div className="bg-gradient-to-br from-[#e0f4f3] via-white to-white rounded-[18px] shadow-sm border border-brand-turquoise/20 p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="text-center md:text-left">
-            <h1 className="text-2xl font-bold text-brand-midnight mb-1">
-                Rapport Pulse+ – {meta.prenom} {meta.nom}
-            </h1>
-            <p className="text-sm text-slate-500">
-                Rôle : <strong>{meta.role || "Collaborateur"}</strong><br />
-                ID : {meta.user_id || "-"}
-            </p>
-            <div className="inline-flex items-center gap-2 bg-[#e0f4f3] text-brand-turquoise rounded-full px-3 py-1 text-xs font-semibold mt-3">
-                <span className="w-2 h-2 rounded-full bg-brand-turquoise"></span>
-                <span>Évaluation issue du questionnaire Pulse+</span>
-            </div>
-        </div>
+// Helper for score colors
+const getScoreColor = (score: number, level?: string): string => {
+    const lvl = level?.toLowerCase() || '';
+    if (lvl.includes('excellent')) return '#10b981'; // Green-500
+    if (lvl.includes('solide')) return '#059669';   // Emerald-600
+    if (lvl.includes('fragile')) return '#f59e0b';  // Amber-500
+    if (lvl.includes('critique') || lvl.includes('vulnérable')) return '#ef4444'; // Red-500
+    // Fallback based on score if no level text
+    if (score >= 4.5) return '#10b981';
+    if (score >= 3.5) return '#059669';
+    if (score >= 2.5) return '#f59e0b';
+    return '#ef4444';
+};
 
-        <div className="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            {/* Radial Gauge CSS-only trick */}
-            <div
-                className="relative w-[70px] h-[70px] rounded-full flex items-center justify-center font-bold text-brand-midnight text-lg"
-                style={{
-                    background: `conic-gradient(#03a39b ${scores.global_score_pct}%, #edf2f7 0)`
-                }}
-            >
-                <div className="absolute inset-2 bg-white rounded-full"></div>
-                <span className="relative z-10">{scores.global_score_pct}%</span>
-            </div>
+const getPriorityColor = (priorite: number): string => {
+    switch (priorite) {
+        case 1: return 'bg-red-100 text-red-700';
+        case 2: return 'bg-orange-100 text-orange-700';
+        case 3: return 'bg-amber-100 text-amber-700';
+        default: return 'bg-slate-100 text-slate-600';
+    }
+};
 
-            <div className="flex flex-col">
-                <span className="text-xs text-slate-400 font-medium">Moyenne globale</span>
-                <span className="text-xl font-black text-brand-midnight">{scores.global_score?.toFixed(2)} / 5</span>
-                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
-                    ${scores.global_niveau?.includes('Fragile') ? 'bg-brand-turquoise/10 text-brand-turquoise' :
-                        scores.global_niveau?.includes('Vulnérable') ? 'bg-amber-100 text-amber-600' :
-                            scores.global_niveau?.includes('Excellent') ? 'bg-emerald-100 text-emerald-600' :
-                                'bg-teal-100 text-teal-700' // Solid default
-                    }`}>
-                    {scores.global_niveau}
-                </span>
-            </div>
-        </div>
-    </div>
-);
-
-const SynthesisCard: React.FC<{ synthese: DiagnosticSynthesis, sections: SectionScore[] }> = ({ synthese, sections }) => (
-    <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8 space-y-6">
-        <div>
-            <h2 className="text-lg font-bold text-brand-midnight mb-2">1. Synthèse globale</h2>
-            <p className="text-sm text-slate-500 leading-relaxed">{synthese.resume_global}</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-50 rounded-xl p-4 text-sm">
-                <strong className="block text-brand-midnight mb-1">Forces principales</strong>
-                <span className="text-slate-500">{synthese.forces_principales}</span>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-4 text-sm">
-                <strong className="block text-brand-midnight mb-1">Axes de vigilance</strong>
-                <span className="text-slate-500">{synthese.axes_de_vigilance}</span>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-4 text-sm">
-                <strong className="block text-brand-midnight mb-1">Lecture générale</strong>
-                <span className="text-slate-500">Ce rapport met en évidence la dynamique globale et les priorités d'action.</span>
-            </div>
-        </div>
-
-        <div className="pt-4 border-t border-dashed border-slate-200 space-y-3">
-            {sections.map(sec => (
-                <div key={sec.id} className="flex items-center justify-between gap-4 text-sm">
-                    <div className="flex items-center gap-2 min-w-[30%]">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: sec.color || '#03a39b' }}></span>
-                        <span className="font-medium text-brand-midnight truncate">{sec.nom}</span>
-                    </div>
-                    <div className="flex-1 flex items-center gap-3">
-                        <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${sec.score_pct}%`, backgroundColor: sec.color || '#03a39b' }}></div>
-                        </div>
-                        <div className="text-right min-w-[90px] text-xs text-slate-400 font-medium">
-                            {sec.score_pct}% • {sec.niveau}
-                        </div>
+const HeaderCard = ({ report, scoreColor }: { report: DiagnosticReport, scoreColor: string }) => {
+    const scores = report.scores || {};
+    return (
+        <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-100 relative overflow-hidden">
+            <div className="flex justify-between items-start mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-[#0f172a] mb-2">Rapport de Diagnostic Pulse+</h1>
+                    <div className="text-slate-500 text-sm flex gap-4">
+                        <p>Préparé pour : <span className="font-semibold text-[#0f172a]">{report.meta?.prenom} {report.meta?.nom}</span></p>
+                        <p>Date : {new Date().toLocaleDateString('fr-FR')}</p>
                     </div>
                 </div>
-            ))}
+                <div className="text-right">
+                    <div className="text-5xl font-black mb-1" style={{ color: scoreColor }}>{scores.global_score?.toFixed(1)}<span className="text-2xl text-slate-300 font-normal">/5</span></div>
+                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white`}
+                        style={{ backgroundColor: scoreColor }}>
+                        {scores.global_niveau}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SynthesisCard = ({ synthese }: { synthese: DiagnosticSynthesis }) => (
+    <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-100">
+        <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+            <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm font-bold">1</span>
+            Synthèse Exécutive
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1 border border-emerald-100 bg-emerald-50/50 rounded-xl p-5">
+                <h3 className="font-bold text-emerald-800 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+                    Forces principales
+                </h3>
+                <p className="text-sm text-emerald-900/80 leading-relaxed">
+                    {synthese.forces_principales || "Vos points forts seront affichés ici une fois le diagnostic complété."}
+                </p>
+            </div>
+
+            <div className="md:col-span-1 border border-amber-100 bg-amber-50/50 rounded-xl p-5">
+                <h3 className="font-bold text-amber-800 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+                    Axes de vigilance
+                </h3>
+                <p className="text-sm text-amber-900/80 leading-relaxed">
+                    {synthese.axes_de_vigilance || "Vos axes d'amélioration seront affichés ici une fois le diagnostic complété."}
+                </p>
+            </div>
+
+            <div className="md:col-span-1 bg-slate-50 rounded-xl p-5 border border-slate-100">
+                <h3 className="font-bold text-slate-700 mb-2 text-sm uppercase tracking-wide">Lecture générale</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                    {synthese.resume_global || "La synthèse globale de votre performance commerciale."}
+                </p>
+            </div>
         </div>
     </div>
 );
 
 const DetailedAnalysisCard: React.FC<{ analyses: SectionAnalysis[], sections: SectionScore[] }> = ({ analyses, sections }) => (
-    <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8 space-y-8">
+    <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8 space-y-8 relative overflow-hidden">
         <h2 className="text-lg font-bold text-brand-midnight">2. Analyse détaillée par section</h2>
+
         <div className="space-y-8">
             {analyses.map(analysis => {
-                const secMeta = sections.find(s => s.id === analysis.section_id) || { color: '#03a39b', score_pct: 0, niveau: '-' };
+                const secMeta = sections.find(s => s.id === analysis.section_id) || { color: '#03a39b', score_pct: 0, niveau: '-', score: 0 };
+                const color = getScoreColor(secMeta.score!, secMeta.niveau);
                 return (
-                    <div key={analysis.section_id} className="pl-4 border-l-4 space-y-4" style={{ borderColor: secMeta.color }}>
+                    <div key={analysis.section_id} className="pl-4 border-l-4 space-y-4" style={{ borderColor: color }}>
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <h3 className="text-base font-bold text-brand-midnight">{analysis.section_nom}</h3>
-                            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${color}20`, color: color }}>
                                 Score : {secMeta.score_pct}% • {secMeta.niveau}
                             </span>
                         </div>
@@ -179,64 +177,148 @@ const DetailedAnalysisCard: React.FC<{ analyses: SectionAnalysis[], sections: Se
     </div>
 );
 
-const RecommendationsCard: React.FC<{ recos: ActionPlanItem[] }> = ({ recos }) => (
-    <div className="bg-white rounded-[18px] border border-slate-200 shadow-sm p-6 lg:p-8">
-        <h2 className="text-lg font-bold text-brand-midnight mb-2">3. Recommandations & plan d’action</h2>
-        <p className="text-sm text-slate-500 mb-6">Les pistes ci-dessous sont priorisées pour faciliter le passage à l’action.</p>
-
-        <ul className="space-y-3">
-            {recos.map((reco, idx) => (
-                <li key={idx} className="bg-slate-50 rounded-xl p-4">
-                    <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold text-brand-turquoise uppercase tracking-wider">Priorité {reco.priorite}</span>
-                        <span className="text-[10px] bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">{reco.horizon}</span>
+const RecommendationsCard = ({ recommendations }: { recommendations: ActionPlanItem[] }) => (
+    <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 relative">
+        <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
+            <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm font-bold">
+                3
+            </span>
+            Recommandations & Plan d'Action
+        </h2>
+        <div className="space-y-4">
+            {recommendations.map((reco, idx) => (
+                <li key={idx} className="border border-slate-100 rounded-xl p-5 hover:border-[#03a39b]/30 transition-colors bg-slate-50/30">
+                    <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-bold text-[#0f172a] text-sm md:text-base">{reco.titre}</h3>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap ml-2">
+                            {reco.horizon}
+                        </span>
                     </div>
-                    <div className="font-bold text-brand-midnight text-sm mb-1">{reco.titre}</div>
-                    <div className="text-xs text-slate-500">{reco.description}</div>
+                    <p className="text-sm text-slate-600 leading-relaxed mb-3">{reco.description}</p>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${reco.priorite === 1 ? 'bg-red-100 text-red-700' :
+                            reco.priorite === 2 ? 'bg-amber-100 text-amber-700' :
+                                'bg-emerald-100 text-emerald-700'
+                            }`}>Priorité {reco.priorite}</span>
+                    </div>
                 </li>
             ))}
-        </ul>
+        </div>
     </div>
 );
 
+// Placeholder for Layout component if it's not defined elsewhere
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
+
 const MyResult: React.FC = () => {
-    const location = useLocation();
     const navigate = useNavigate();
-    const { profile } = useAuth(); // Get auth profile for name fallback
-    const { result, answers, diagnosticId } = location.state || {}; // Retrieve passed data
-    const [dbReport, setDbReport] = React.useState<DiagnosticReport | null>(null);
-    const [loading, setLoading] = React.useState(false);
+    const location = useLocation();
+    const { profile } = useAuth();
+    const [resultData, setResultData] = useState<DiagnosticReport | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isEphemeral, setIsEphemeral] = useState(false);
+    const [showCTAModal, setShowCTAModal] = useState(false);
 
-    const [isCTAOpen, setIsCTAOpen] = React.useState(false);
-
-    // CTA Modal Timer - Every 30 seconds
-    React.useEffect(() => {
-        const interval = setInterval(() => {
-            setIsCTAOpen(true);
-        }, 60000); // 1 minute
-
-        return () => clearInterval(interval);
-    }, []);
-
-    // Fetch from DB if no state (e.g. direct link or history)
-    // Note: We might want to use a query param or URL param :id
-    React.useEffect(() => {
-        if (!result && !loading) {
-            // Check if we have an ID in URL search params (if we implement history links)
-            const searchParams = new URLSearchParams(location.search);
-            const id = searchParams.get('id');
-            if (id) {
-                setLoading(true);
-                supabase.from('diagnostics').select('report_data').eq('id', id).single()
-                    .then(({ data, error }) => {
-                        if (data && data.report_data) {
-                            setDbReport(data.report_data);
-                        }
-                        setLoading(false);
-                    });
-            }
+    useEffect(() => {
+        if (location.state?.ephemeral) {
+            setIsEphemeral(true);
         }
-    }, [location, result]);
+    }, [location]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                if (location.state?.resultData) {
+                    console.log("Using result data from navigation state");
+                    setResultData(location.state.resultData);
+                    setIsEphemeral(!!location.state.ephemeral);
+                    setLoading(false);
+                    return;
+                }
+
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    setLoading(false);
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from('diagnostics')
+                    .select('report_data') // Select report_data directly
+                    .eq('user_id', session.user.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) throw error;
+                if (data && data.report_data) {
+                    setResultData(data.report_data as DiagnosticReport);
+                }
+
+                setLoading(false);
+            } catch (err: any) {
+                console.error("Error loading results:", err);
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [navigate, location]);
+
+    useEffect(() => {
+        if (isEphemeral) {
+            const timer = setTimeout(() => {
+                setShowCTAModal(true);
+            }, 60000); // 1 minute
+            return () => clearTimeout(timer);
+        }
+    }, [isEphemeral]);
+
+    if (loading) return (
+        <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-[#03a39b] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-slate-500 font-medium">Chargement de votre rapport...</p>
+            </div>
+        </div>
+    );
+
+    if (error) return (
+        <div className="min-h-screen bg-[#f8fafc] p-8 flex justify-center">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-red-100 max-w-lg text-center">
+                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">⚠️</span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-800 mb-2">Impossible de charger le rapport</h2>
+                <p className="text-slate-600 mb-6">{error}</p>
+                <button onClick={() => navigate('/')} className="px-6 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">
+                    Retour à l'accueil
+                </button>
+            </div>
+        </div>
+    );
+
+    if (!resultData) return (
+        <div className="min-h-screen bg-[#f8fafc] p-8 flex justify-center items-center">
+            <div className="text-center max-w-md">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FileText className="w-10 h-10 text-slate-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 mb-3">Aucun résultat disponible</h2>
+                <p className="text-slate-500 mb-8 leading-relaxed">
+                    Il semble que vous n'ayez pas encore effectué de diagnostic ou que votre session ait expiré.
+                </p>
+                <button onClick={() => navigate('/diagnostic/start')} className="inline-flex items-center gap-2 px-8 py-3 bg-[#03a39b] text-white rounded-xl font-bold shadow-lg shadow-[#03a39b]/20 hover:bg-[#02847e] transition-all transform hover:-translate-y-0.5">
+                    Lancer un diagnostic
+                    <ArrowRight className="w-5 h-5" />
+                </button>
+            </div>
+        </div>
+    );
+
+    const scoreColor = getScoreColor(resultData.scores?.global_score || 0, resultData.scores?.global_niveau);
 
     const handleDownloadPDF = async () => {
         const input = document.getElementById('premium-report-content');
@@ -245,25 +327,19 @@ const MyResult: React.FC = () => {
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        const margin = 0; // No margin as the design has its own padding/bg
+        const margin = 0;
         const availableWidth = pdfWidth;
 
-        // Force display block for capture, although it's off-screen
         input.style.display = 'block';
 
         const canvas = await html2canvas(input, {
             scale: 2,
             useCORS: true,
             allowTaint: true,
-            backgroundColor: '#0a0f1a', // Match theme background
+            backgroundColor: '#0a0f1a',
             logging: false,
-            windowWidth: 1200 // Force wide render for desktop layout
+            windowWidth: 1200
         });
-
-        // Split into pages if needed (basic A4 ratio check)
-        // With this design, it's better to capture sections or the whole thing.
-        // Given it's a specific design, let's try to fit or split intelligently.
-        // For V1, let's just create a multi-page PDF by slicing the canvas.
 
         const imgWidth = pdfWidth;
         const pageHeight = pdfHeight;
@@ -271,15 +347,12 @@ const MyResult: React.FC = () => {
         let heightLeft = imgHeight;
         let position = 0;
 
-        // Page 1
         pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
 
         while (heightLeft > 0) {
             position = heightLeft - imgHeight;
 
-            // If remaining height is less than A4, use custom page size to avoid whitespace
-            // We use a small epsilon for float comparison safety
             if (heightLeft < pageHeight - 1) {
                 pdf.addPage([pdfWidth, heightLeft], 'p');
             } else {
@@ -292,123 +365,158 @@ const MyResult: React.FC = () => {
 
         pdf.save(`Pulse_Express_${profile?.nom?.replace(/Utilisateur/i, '').trim() || 'Rapport'}.pdf`);
 
-        // Hide again
         input.style.display = 'none';
     };
 
-    let candidateData = dbReport || result;
-
-    if (Array.isArray(result) && result.length > 0) {
-        candidateData = result[0];
-    }
-
-    // Unwrap 'json' if present
-    const reportData: DiagnosticReport = (candidateData && candidateData.json) ? candidateData.json : (candidateData || {});
-
-    // Validation: Check for a key property like 'scores'
-    const hasValidData = reportData && reportData.scores;
-
-    // IF NO DATA (and not loading) -> Show "No Result" state
-    if (!hasValidData && !loading) {
-        return (
-            <div className="min-h-screen bg-brand-soft-bg p-8 flex flex-col items-center justify-center animate-fade-in text-center space-y-6">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
-                    <LayoutDashboard size={40} />
-                </div>
-                <h2 className="text-2xl font-bold text-brand-midnight">Aucun résultat disponible</h2>
-                <p className="text-slate-500 max-w-md">
-                    Les résultats sont éphémères pour des raisons de sécurité.
-                    Si vous avez rechargé la page, vos résultats ont été effacés.
-                </p>
-                <Link
-                    to="/diagnostic/start"
-                    className="px-6 py-3 bg-brand-turquoise text-white rounded-xl font-bold hover:bg-brand-turquoise-dark transition-colors shadow-lg shadow-brand-turquoise/20"
-                >
-                    Nouveau Diagnostic
-                </Link>
-            </div>
-        );
-    }
-
-    // Final data to use
-    // Final data to use
-    const finalReportData = reportData;
-    const isMock = false; // Mock disabled
-
     return (
-        <div className="min-h-screen bg-brand-soft-bg p-4 md:p-8 lg:p-12 animate-fade-in font-sans">
-            <div className="max-w-[1120px] mx-auto space-y-6" id="report-content">
+        <Layout>
+            <div className="min-h-screen bg-[#f8fafc] pb-20 font-['Inter']">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <HeaderCard report={resultData} scoreColor={scoreColor} />
 
-                {/* Navigation & Actions */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <Link
-                        to="/diagnostics"
-                        className="flex items-center text-slate-400 hover:text-brand-midnight transition-colors font-bold text-sm"
-                    >
-                        <ArrowLeft size={18} className="mr-2" />
-                        Retour aux résultats
-                    </Link>
+                    <SynthesisCard synthese={resultData.synthese || {}} />
 
-                    {/* PDF Download Button */}
-                    <button
-                        onClick={handleDownloadPDF}
-                        className="flex items-center gap-2 bg-brand-midnight text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-800 transition-colors shadow-lg shadow-brand-midnight/20"
-                    >
-                        <Download size={18} />
-                        <span>Télécharger le PDF</span>
-                    </button>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        <div className="lg:col-span-1 space-y-4">
+                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                                <h3 className="font-bold text-[#0f172a] mb-4 text-sm uppercase tracking-wide">Détail des scores</h3>
+                                <div className="space-y-4">
+                                    {(resultData.scores?.sections || []).map((sec, idx) => {
+                                        const sColor = getScoreColor(sec.score, sec.niveau);
+                                        return (
+                                            <div key={idx}>
+                                                <div className="flex justify-between text-sm mb-1.5">
+                                                    <span className="font-medium text-slate-700">{sec.nom}</span>
+                                                    <span className="font-bold" style={{ color: sColor }}>{sec.score?.toFixed(1)}/5</span>
+                                                </div>
+                                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                    <div className="h-full rounded-full transition-all duration-1000 ease-out"
+                                                        style={{ width: `${sec.score_pct}%`, backgroundColor: sColor }}></div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* CTA Box for PDF */}
+                            <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-2xl p-6 text-center text-white shadow-lg">
+                                <div className="mb-4 flex justify-center">
+                                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                                        <Download className="w-6 h-6 text-white" />
+                                    </div>
+                                </div>
+                                <h3 className="font-bold text-lg mb-2">Votre rapport complet</h3>
+                                <p className="text-sm text-slate-300 mb-6">Téléchargez la version PDF détaillée de votre diagnostic commercial.</p>
+                                <button
+                                    onClick={handleDownloadPDF}
+                                    className="w-full py-3 bg-[#03a39b] hover:bg-[#02847e] text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                                >
+                                    Télécharger le PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* DETAILED ANALYSIS with BLUR if Ephemeral */}
+                            <div className="relative">
+                                <div className={isEphemeral ? "filter blur-sm select-none pointer-events-none opacity-60" : ""}>
+                                    <DetailedAnalysisCard analyses={resultData.analyse_detaillee_par_sections || []} sections={resultData.scores?.sections || []} />
+                                </div>
+                                {isEphemeral && (
+                                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center">
+                                        <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-white/50 max-w-md">
+                                            <Lock className="w-12 h-12 text-[#03a39b] mx-auto mb-4" />
+                                            <h3 className="text-xl font-bold text-[#0f172a] mb-2">Débloquez votre analyse détaillée</h3>
+                                            <p className="text-slate-600 mb-6">Accédez aux détails complets de votre performance par section et comparez-vous au marché.</p>
+                                            <button onClick={() => setShowCTAModal(true)} className="px-8 py-3 bg-[#03a39b] hover:bg-[#02847e] text-white font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5">
+                                                Voir mon analyse complète
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* RECOMMENDATIONS with BLUR if Ephemeral */}
+                            <div className="relative">
+                                <div className={isEphemeral ? "filter blur-sm select-none pointer-events-none opacity-60" : ""}>
+                                    <RecommendationsCard recommendations={resultData.recommandations_et_plan_action || []} />
+                                </div>
+                                {isEphemeral && (
+                                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center">
+                                        <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-white/50 max-w-md">
+                                            <Lock className="w-12 h-12 text-[#03a39b] mx-auto mb-4" />
+                                            <h3 className="text-xl font-bold text-[#0f172a] mb-2">Plan d'action personnalisé</h3>
+                                            <p className="text-slate-600 mb-6">Veuillez entrer votre email pour découvrir vos recommandations prioritaires.</p>
+                                            <button onClick={() => setShowCTAModal(true)} className="px-8 py-3 bg-[#03a39b] hover:bg-[#02847e] text-white font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5">
+                                                Débloquer mes recommandations
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                {/* 1. Header Card - Use profile name if meta is generic */}
-                <HeaderCard
-                    meta={{
-                        ...finalReportData.meta,
-                        prenom: ((finalReportData.meta?.prenom === 'Utilisateur' || !finalReportData.meta?.prenom) && profile?.prenom ? profile.prenom : finalReportData.meta?.prenom)?.replace(/Utilisateur/i, '').trim(),
-                        nom: ((finalReportData.meta?.nom === '' || !finalReportData.meta?.nom) && profile?.nom ? profile.nom : finalReportData.meta?.nom)?.replace(/Utilisateur/i, '').trim(),
-                        user_id: finalReportData.meta?.user_id === 'invite@demo.com' ? 'invite@keepgrowing.fr' : (finalReportData.meta?.user_id || 'invite@keepgrowing.fr')
-                    }}
-                    scores={finalReportData.scores || { global_score: 0, global_score_pct: 0, global_niveau: "-", sections: [] }}
-                />
-
-                {/* 2. Synthesis Card */}
-                <SynthesisCard
-                    synthese={finalReportData.synthese || {}}
-                    sections={finalReportData.scores?.sections || []}
-                />
-
-                {/* 3. Detailed Analysis */}
-                <DetailedAnalysisCard
-                    analyses={finalReportData.analyse_detaillee_par_sections || []}
-                    sections={finalReportData.scores?.sections || []}
-                />
-
-                {/* 4. Recommendations */}
-                <RecommendationsCard recos={finalReportData.recommandations_et_plan_action || []} />
-
-
-
-                <div className="text-center text-xs text-slate-400 mt-8">
-                    Rapport généré par Pulse Express.
-                </div>
-            </div >
-
-            {/* Hidden container for PDF generation */}
-            < div style={{ position: 'absolute', top: -10000, left: -10000, overflow: 'hidden' }}>
+            {/* Hidden PDF Component */}
+            <div className="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none">
                 <PremiumReport report={{
-                    ...finalReportData,
+                    ...resultData,
                     meta: {
-                        ...finalReportData.meta,
-                        // Ensure we use the latest profile name if available
-                        prenom: (profile?.prenom || finalReportData.meta?.prenom || 'Utilisateur').replace(/Utilisateur/i, '').trim(),
-                        nom: (profile?.nom || finalReportData.meta?.nom || '').replace(/Utilisateur/i, '').trim(),
-                        role: profile?.role || finalReportData.meta?.role || 'Individuel',
-                        user_id: finalReportData.meta?.user_id === 'invite@demo.com' ? 'invite@keepgrowing.fr' : (finalReportData.meta?.user_id || 'invite@keepgrowing.fr')
+                        ...resultData.meta,
+                        prenom: (profile?.prenom || resultData.meta?.prenom || 'Utilisateur').replace(/Utilisateur/i, '').trim(),
+                        nom: (profile?.nom || resultData.meta?.nom || '').replace(/Utilisateur/i, '').trim(),
+                        role: profile?.role || resultData.meta?.role || 'Individuel',
+                        user_id: resultData.meta?.user_id === 'invite@demo.com' ? 'invite@keepgrowing.fr' : (resultData.meta?.user_id || 'invite@keepgrowing.fr')
                     }
                 }} />
-            </div >
+            </div>
 
-            <CallToActionModal isOpen={isCTAOpen} onClose={() => setIsCTAOpen(false)} />
-        </div >
+            {/* CTA MODAL */}
+            {showCTAModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0f172a]/80 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="p-8 text-center relative">
+                            <button
+                                onClick={() => setShowCTAModal(false)}
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+
+                            <div className="w-16 h-16 bg-[#e0f4f3] rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                                <FileText className="w-8 h-8 text-[#03a39b]" />
+                            </div>
+
+                            <h3 className="text-2xl font-bold text-[#0f172a] mb-3">Sauvegardez votre rapport</h3>
+                            <p className="text-slate-600 leading-relaxed mb-8">
+                                Votre diagnostic est prêt ! Entrez votre email pour recevoir votre rapport PDF complet et accéder à votre espace personnel.
+                            </p>
+
+                            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); /* Handle signup/login redirect here */ navigate('/signup'); }}>
+                                <div>
+                                    <input
+                                        type="email"
+                                        placeholder="votre@email.com"
+                                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#03a39b] focus:border-transparent outline-none transition-all font-medium text-[#0f172a] placeholder:text-slate-400"
+                                        autoFocus
+                                    />
+                                </div>
+                                <button type="submit" className="w-full py-4 bg-[#03a39b] hover:bg-[#02847e] text-white text-lg font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5">
+                                    Voir mon résultat complet
+                                </button>
+                            </form>
+
+                            <p className="mt-6 text-xs text-slate-400">
+                                En continuant, vous acceptez nos CGU et notre politique de confidentialité.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </Layout>
     );
 };
 
