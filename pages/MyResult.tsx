@@ -81,9 +81,17 @@ const getPriorityColor = (priorite: number): string => {
     switch (priorite) {
         case 1: return 'bg-red-100 text-red-700';
         case 2: return 'bg-orange-100 text-orange-700';
-        case 3: return 'bg-amber-100 text-amber-700';
-        default: return 'bg-slate-100 text-slate-600';
+        case 3: return 'bg-emerald-100 text-emerald-700';
+        default: return 'bg-emerald-100 text-emerald-700';
     }
+};
+
+const getHorizonColor = (horizon: string): string => {
+    const h = horizon.toLowerCase();
+    if (h.includes('immédiat')) return 'bg-red-100 text-red-700';
+    if (h.includes('court')) return 'bg-orange-100 text-orange-700';
+    if (h.includes('moyen')) return 'bg-amber-100 text-amber-700';
+    return 'bg-emerald-100 text-emerald-700';
 };
 
 const HeaderCard = ({ report, scoreColor }: { report: DiagnosticReport, scoreColor: string }) => {
@@ -122,38 +130,11 @@ const SynthesisCard = ({ synthese }: { synthese: DiagnosticSynthesis }) => {
             </h2>
 
             <div className="space-y-6">
-                {/* Row 1: Forces & Vigilance */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border border-emerald-100 bg-emerald-50/50 rounded-xl p-6">
-                        <h3 className="font-bold text-emerald-800 mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4" />
-                            Forces principales
-                        </h3>
-                        <div className="text-sm text-emerald-900/80 leading-relaxed whitespace-pre-line">
-                            {synthese.forces_principales && synthese.forces_principales.length > 5
-                                ? synthese.forces_principales
-                                : <span className="italic opacity-60">Analyse des forces en cours... (Données non disponibles)</span>}
-                        </div>
-                    </div>
-
-                    <div className="border border-amber-100 bg-amber-50/50 rounded-xl p-6">
-                        <h3 className="font-bold text-amber-800 mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4" />
-                            Axes de vigilance
-                        </h3>
-                        <div className="text-sm text-amber-900/80 leading-relaxed whitespace-pre-line">
-                            {synthese.axes_de_vigilance && synthese.axes_de_vigilance.length > 5
-                                ? synthese.axes_de_vigilance
-                                : <span className="italic opacity-60">Identification des axes d'amélioration... (Données non disponibles)</span>}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Row 2: General Analysis */}
+                {/* General Analysis Only */}
                 <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
                     <h3 className="font-bold text-slate-700 mb-3 text-sm uppercase tracking-wide flex items-center gap-2">
                         <LayoutDashboard className="w-4 h-4" />
-                        Lecture générale
+                        Synthèse générale
                     </h3>
                     <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
                         {synthese.resume_global || "La synthèse globale de votre performance commerciale sera disponible une fois le traitement terminé."}
@@ -208,16 +189,13 @@ const RecommendationsCard = ({ recommendations }: { recommendations: ActionPlanI
                 <li key={idx} className="border border-slate-100 rounded-xl p-5 hover:border-[#03a39b]/30 transition-colors bg-slate-50/30">
                     <div className="flex justify-between items-start mb-2">
                         <h3 className="font-bold text-[#0f172a] text-sm md:text-base">{reco.titre}</h3>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap ml-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap ml-2 ${getHorizonColor(reco.horizon)}`}>
                             {reco.horizon}
                         </span>
                     </div>
                     <p className="text-sm text-slate-600 leading-relaxed mb-3">{reco.description}</p>
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${reco.priorite === 1 ? 'bg-red-100 text-red-700' :
-                            reco.priorite === 2 ? 'bg-amber-100 text-amber-700' :
-                                'bg-emerald-100 text-emerald-700'
-                            }`}>Priorité {reco.priorite}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${getPriorityColor(reco.priorite)}`}>Priorité {reco.priorite}</span>
                     </div>
                 </li>
             ))}

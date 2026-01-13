@@ -21,6 +21,23 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
         return '#ef4444';
     };
 
+    const getHorizonStyle = (horizon: string) => {
+        const h = horizon.toLowerCase();
+        if (h.includes('immédiat')) return { backgroundColor: '#fee2e2', color: '#b91c1c' }; // red-100/700
+        if (h.includes('court')) return { backgroundColor: '#ffedd5', color: '#c2410c' };   // orange-100/700
+        if (h.includes('moyen')) return { backgroundColor: '#fef3c7', color: '#b45309' };   // amber-100/700
+        return { backgroundColor: '#d1fae5', color: '#047857' };                            // emerald-100/700
+    };
+
+    const getPriorityStyle = (priorite: number) => {
+        switch (priorite) {
+            case 1: return { backgroundColor: '#fee2e2', color: '#b91c1c' };
+            case 2: return { backgroundColor: '#ffedd5', color: '#c2410c' };
+            case 3: return { backgroundColor: '#d1fae5', color: '#047857' };
+            default: return { backgroundColor: '#d1fae5', color: '#047857' };
+        }
+    };
+
     // Construct QuickChart URLs
     const getGaugeUrl = (scorePct: number, color: string) => {
         const config = {
@@ -95,9 +112,9 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     .premium-report-root .score-list h4{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
     .premium-report-root .score-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
     .premium-report-root .score-item:last-child{border-bottom:none;}
-    .premium-report-root .score-item-name{font-size:12px;color:var(--text);flex:1;padding-right:12px;}
-    .premium-report-root .score-item-sub{font-size:10px;color:var(--text-muted);display:block;}
-    .premium-report-root .score-badge{display: inline-flex; align-items: center; justify-content: center; height: 24px; padding:0 12px; border-radius:6px; font-size:11px; font-weight:600; color:#fff; white-space:nowrap; vertical-align: middle; line-height: 1;}
+    .premium-report-root .score-item-name{font-size:13px;color:var(--text);flex:1;padding-right:16px;}
+    .premium-report-root .score-item-sub{font-size:11px;color:var(--text-muted);display:block;margin-top:2px;}
+    .premium-report-root .score-badge{display: inline-flex; align-items: center; justify-content: center; height: 28px; padding:0 14px; border-radius:8px; font-size:12px; font-weight:600; color:#fff; white-space:nowrap; vertical-align: middle; line-height: 1;}
     .premium-report-root .section-block{background:var(--bg-card);border-radius:16px;margin-bottom:24px;border:1px solid var(--border);overflow:hidden; page-break-inside: avoid;}
     .premium-report-root .section-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:var(--bg-section);border-bottom:1px solid var(--border);}
     .premium-report-root .section-title{font-size:15px;font-weight:600;color:var(--primary);}
@@ -130,7 +147,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
         <div id="premium-report-content" className="premium-report-root" style={{
             width: '210mm',
             minHeight: '297mm',
-            padding: '40px',
+            padding: '48px 56px',
             backgroundColor: 'white',
             fontFamily: 'Inter, sans-serif',
             color: '#1e293b',
@@ -148,8 +165,8 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                     </div>
                 </div>
                 <div className="text-right">
-                    <div className="text-4xl font-black text-[#03a39b] mb-1">{report.scores.global_score?.toFixed(1)}<span className="text-lg text-slate-300">/5</span></div>
-                    <div className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white"
+                    <div className="text-5xl font-black text-[#03a39b] mb-2">{report.scores.global_score?.toFixed(1)}<span className="text-2xl text-slate-300">/5</span></div>
+                    <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-white min-w-[100px]"
                         style={{ backgroundColor: getScoreColor(report.scores.global_score, report.scores.global_niveau) }}>
                         {report.scores.global_niveau}
                     </div>
@@ -162,34 +179,24 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                     <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">1</span>
                     Synthèse Exécutive
                 </h2>
-                <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-sm text-slate-600 leading-relaxed shadow-sm">
+                <div className="bg-slate-50 rounded-2xl p-8 mb-8 text-[15px] text-slate-600 leading-relaxed shadow-sm">
                     {report.synthese.resume_global}
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                    <div className="border border-emerald-100 bg-emerald-50/50 rounded-xl p-5">
-                        <h3 className="font-bold text-emerald-800 mb-2 text-sm uppercase tracking-wide">Forces identifiées</h3>
-                        <p className="text-sm text-emerald-900/80">{report.synthese.forces_principales || "Information non disponible"}</p>
-                    </div>
-                    <div className="border border-amber-100 bg-amber-50/50 rounded-xl p-5">
-                        <h3 className="font-bold text-amber-800 mb-2 text-sm uppercase tracking-wide">Points de vigilance</h3>
-                        <p className="text-sm text-amber-900/80">{report.synthese.axes_de_vigilance || "Information non disponible"}</p>
-                    </div>
                 </div>
             </div>
 
             {/* Scores List */}
-            <div className="mb-12">
-                <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">2</span>
+            <div className="mb-16">
+                <h2 className="text-2xl font-bold text-[#0f172a] mb-8 flex items-center gap-4">
+                    <span className="w-10 h-10 rounded-xl bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-base">2</span>
                     Détail des Scores
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {filteredSections.map((sec, idx) => {
                         const color = getScoreColor(sec.score, sec.niveau);
                         return (
-                            <div key={idx} className="flex items-center gap-4 text-sm">
+                            <div key={idx} className="flex items-center gap-6 text-[15px]">
                                 <div className="w-1/3 font-medium text-slate-700">{sec.nom}</div>
-                                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
                                     <div className="h-full rounded-full" style={{ width: `${sec.score_pct}%`, backgroundColor: color }}></div>
                                 </div>
                                 <div className="score-badge" style={{ backgroundColor: color }}>
@@ -209,25 +216,25 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                 const sectionColor = getScoreColor(sec.score, sec.niveau);
 
                 return (
-                    <div key={sec.id || idx} className="mb-12">
-                        <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">{idx + 3}</span>
+                    <div key={sec.id || idx} className="mb-16">
+                        <h2 className="text-2xl font-bold text-[#0f172a] mb-8 flex items-center gap-4">
+                            <span className="w-10 h-10 rounded-xl bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-base">{idx + 3}</span>
                             {sec.nom}
-                            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white ml-auto"
-                                style={{ backgroundColor: sectionColor }}>
+                            <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-white ml-auto"
+                                style={{ backgroundColor: sectionColor, minWidth: '100px' }}>
                                 {sec.niveau}
                             </span>
                         </h2>
-                        <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-sm text-slate-600 leading-relaxed shadow-sm">
+                        <div className="bg-slate-50 rounded-2xl p-8 mb-8 text-[15px] text-slate-600 leading-relaxed shadow-sm">
                             {analysisDetails.resume_section}
                         </div>
 
                         {/* RUBRIQUES (Themes) */}
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             {(analysisDetails.themes || []).map((theme, tIdx) => (
-                                <div key={tIdx} className="border border-slate-100 rounded-xl p-5 bg-white shadow-sm">
-                                    <h3 className="font-bold text-[#0f172a] mb-2 text-base">{theme.titre}</h3>
-                                    <p className="text-sm text-slate-600 leading-relaxed mb-4">{theme.texte}</p>
+                                <div key={tIdx} className="border border-slate-100 rounded-xl p-6 bg-white shadow-sm">
+                                    <h3 className="font-bold text-[#0f172a] mb-3 text-lg">{theme.titre}</h3>
+                                    <p className="text-[15px] text-slate-600 leading-relaxed mb-5">{theme.texte}</p>
                                     {theme.recommandations && theme.recommandations.length > 0 && (
                                         <div className="bg-blue-50 border-l-4 border-blue-200 p-4 text-sm text-blue-800">
                                             <h4 className="font-semibold mb-2">Recommandations :</h4>
@@ -246,24 +253,24 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
             })}
 
             {/* RECOMMENDATIONS SECTION */}
-            <div className="mb-12">
-                <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">
+            <div className="mb-16">
+                <h2 className="text-2xl font-bold text-[#0f172a] mb-8 flex items-center gap-4">
+                    <span className="w-10 h-10 rounded-xl bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-base">
                         {(report.analyse_detaillee_par_sections || []).filter(sec => !report.scores?.sections?.find(s => s.id === sec.section_id)?.nom.toLowerCase().includes('coordonnées')).length + 3}
                     </span>
                     Recommandations Générales & Plan d'Action
                 </h2>
                 <div className="space-y-6">
                     {(report.recommandations_et_plan_action || []).map((reco, idx) => (
-                        <div key={idx} className="border border-slate-100 rounded-xl p-5 bg-white shadow-sm">
-                            <div className="flex justify-between items-center mb-2">
-                                <h3 className="font-bold text-[#0f172a] text-base">{reco.titre}</h3>
-                                <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                                    <span className="px-2 py-1 rounded-full bg-slate-100">Priorité: {reco.priorite}</span>
-                                    <span className="px-2 py-1 rounded-full bg-slate-100">Horizon: {reco.horizon}</span>
+                        <div key={idx} className="border border-slate-100 rounded-xl p-6 bg-white shadow-sm">
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="font-bold text-[#0f172a] text-lg">{reco.titre}</h3>
+                                <div className="flex items-center gap-3 text-xs font-medium text-slate-500">
+                                    <span className="px-3 py-1 rounded-full uppercase tracking-wider font-bold" style={getPriorityStyle(reco.priorite)}>Priorité: {reco.priorite}</span>
+                                    <span className="px-3 py-1 rounded-full uppercase tracking-wider font-bold" style={getHorizonStyle(reco.horizon)}>Horizon: {reco.horizon}</span>
                                 </div>
                             </div>
-                            <p className="text-sm text-slate-600 leading-relaxed">{reco.description}</p>
+                            <p className="text-[15px] text-slate-600 leading-relaxed">{reco.description}</p>
                         </div>
                     ))}
                 </div>
