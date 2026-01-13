@@ -210,6 +210,8 @@ const RecommendationsCard = ({ recommendations }: { recommendations: ActionPlanI
 // Placeholder for Layout component if it's not defined elsewhere
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
 
+import { sendToN8N, buildN8NPayload } from '../services/n8nService';
+
 const MyResult: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -219,6 +221,12 @@ const MyResult: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isEphemeral, setIsEphemeral] = useState(false);
     const [showCTAModal, setShowCTAModal] = useState(false);
+    const [emailInput, setEmailInput] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Capture diagnosticId and answers which are critical for the update
+    const diagnosticId = location.state?.diagnosticId;
+    const answers = location.state?.answers;
 
     useEffect(() => {
         if (location.state?.ephemeral) {
@@ -367,9 +375,64 @@ const MyResult: React.FC = () => {
             heightLeft -= pageHeight;
         }
 
-        pdf.save(`Pulse_Express_${profile?.nom?.replace(/Utilisateur/i, '').trim() || 'Rapport'}.pdf`);
+        const fileName = `Pulse_Express_${(profile?.nom || resultData.meta?.nom || 'Utilisateur').replace(/Utilisateur/i, '').trim()}.pdf`;
+        pdf.save(fileName);
 
         input.style.display = 'none';
+    };
+
+    const handleEmailSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!emailInput || !emailInput.includes('@')) return; // Basic validation
+
+        setIsSubmitting(true);
+
+        try {
+            // 1. Update Database if we have an ID
+            if (diagnosticId) {
+                console.log("Updating diagnostic owner...", diagnosticId, emailInput);
+                const { error: dbError } = await supabase
+                    .from('diagnostics')
+                    .update({
+                        user_id: emailInput,
+                        // Update meta in report_data as well if needed, or just relying on user_id column
+                    })
+                    .eq('id', diagnosticId);
+
+                if (dbError) console.error("DB Update Error", dbError);
+            }
+
+            // 2. Trigger N8N Webhook with answers and new email
+            if (answers) {
+                console.log("Triggering N8N with email", emailInput);
+                const n8nPayload = buildN8NPayload(
+                    `${resultData.meta?.prenom} ${resultData.meta?.nom}`,
+                    emailInput,
+                    answers
+                );
+
+                // Fire and forget - don't block UI on webhook response
+                sendToN8N(n8nPayload, { role: 'INDIVIDUEL', ...resultData.meta }).catch(err => {
+                    console.error("N8N Webhook failed", err);
+                });
+            }
+
+            // 3. Unlock and Download
+            setIsEphemeral(false);
+            setShowCTAModal(false);
+
+            setTimeout(() => {
+                handleDownloadPDF();
+            }, 500);
+
+        } catch (err) {
+            console.error("Submission error", err);
+            // Fallmback: unlock anyway so user isn't stuck
+            setIsEphemeral(false);
+            setShowCTAModal(false);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -489,14 +552,7 @@ const MyResult: React.FC = () => {
                                 Votre diagnostic est prêt ! Entrez votre email pour recevoir votre rapport PDF complet et accéder à votre espace personnel.
                             </p>
 
-                            <form className="space-y-4" onSubmit={(e) => {
-                                e.preventDefault();
-                                // Unlock the report
-                                setIsEphemeral(false);
-                                setShowCTAModal(false);
-                                // Optionally trigger PDF download automatically
-                                setTimeout(() => handleDownloadPDF(), 500);
-                            }}>
+                            <form className="space-y-4" onSubmit={handleEmailSubmit}>
                                 <div>
                                     <input
                                         type="email"
@@ -504,10 +560,17 @@ const MyResult: React.FC = () => {
                                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#03a39b] focus:border-transparent outline-none transition-all font-medium text-[#0f172a] placeholder:text-slate-400"
                                         autoFocus
                                         required
+                                        value={emailInput}
+                                        onChange={(e) => setEmailInput(e.target.value)}
+                                        disabled={isSubmitting}
                                     />
                                 </div>
-                                <button type="submit" className="w-full py-4 bg-[#03a39b] hover:bg-[#02847e] text-white text-lg font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5">
-                                    Voir mon résultat complet
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className={`w-full py-4 bg-[#03a39b] hover:bg-[#02847e] text-white text-lg font-bold rounded-xl shadow-lg shadow-[#03a39b]/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 ${isSubmitting ? 'opacity-70 cursor-wait' : ''}`}
+                                >
+                                    {isSubmitting ? 'Enregistrement...' : 'Voir mon résultat complet'}
                                 </button>
                             </form>
 
