@@ -120,7 +120,6 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
         line-height: 1.6;
         padding: 60px 70px; 
         width: 210mm;
-        min-height: 297mm;
         margin: 0 auto;
         position: relative;
         box-sizing: border-box;
@@ -267,7 +266,6 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     return (
         <div id="premium-report-content" className="premium-report-root" style={{
             width: '210mm',
-            minHeight: '297mm',
             backgroundColor: 'white',
             position: 'relative'
         }}>
@@ -349,11 +347,9 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
                             </div>
                         </div>
 
-                        <div className="card" style={{ marginBottom: '24px' }}>
-                            <p style={{ fontSize: '15px', color: 'var(--slate-600)' }}>
-                                {analysisDetails.resume_section}
-                            </p>
-                        </div>
+                        <p style={{ fontSize: '15px', color: 'var(--slate-600)', marginBottom: '24px' }}>
+                            {analysisDetails.resume_section}
+                        </p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                             {(analysisDetails.themes || []).map((theme, tIdx) => (
@@ -378,7 +374,7 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
             })}
 
             {/* RECOMMENDATIONS SECTION */}
-            <div className="mb-16">
+            <div>
                 <h2>
                     <span className="section-number">
                         {(report.analyse_detaillee_par_sections || []).filter(sec => !report.scores?.sections?.find(s => s.id === sec.section_id)?.nom.toLowerCase().includes('coordonnées')).length + 3}
