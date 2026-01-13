@@ -91,51 +91,172 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
     };
 
     const styles = `
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-    .premium-report-root { --bg:#0a0f1a;--bg-card:#111827;--bg-section:#1a2332;--bg-rubrique:#0d1219;--primary:#03a39b;--primary-light:rgba(3,163,155,0.15);--text:#f1f5f9;--text-soft:#94a3b8;--text-muted:#64748b;--border:rgba(255,255,255,0.08);--success:#10b981;--warning:#f59e0b;--danger:#ef6355; font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding:32px; padding-bottom: 1px; width: 1100px; margin: 0 auto; }
-    .premium-report-root * { box-sizing:border-box;margin:0;padding:0; }
-    .premium-report-root .report-header{background:var(--bg-card);border-radius:16px;padding:28px 32px;margin-bottom:24px;border:1px solid var(--border);}
-    .premium-report-root .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
-    .premium-report-root .header-left{display:flex;align-items:center;gap:16px;}
-    .premium-report-root .logo{width:44px;height:44px;}
-    .premium-report-root .header-title{font-size:22px;font-weight:700;}
-    .premium-report-root .header-subtitle{font-size:14px;color:var(--text-soft);margin-top:2px;}
-    .premium-report-root .header-date{font-size:12px;color:var(--text-muted);}
-    .premium-report-root .header-content{display:grid;grid-template-columns:200px 1fr 260px;gap:28px;align-items:start;}
-    .premium-report-root .main-score-box{text-align:center;padding:20px;background:var(--bg-section);border-radius:12px;}
-    .premium-report-root .main-score-box h3{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
-    .premium-report-root .chart-img{display:block;margin:0 auto;max-width:100%;}
-    .premium-report-root .score-label-main{font-size:12px;color:var(--text-soft);margin-top:8px;}
-    .premium-report-root .spider-box{text-align:center;}
-    .premium-report-root .spider-box h3{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
-    .premium-report-root .score-list{background:var(--bg-section);border-radius:12px;padding:16px;}
-    .premium-report-root .score-list h4{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
-    .premium-report-root .score-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
-    .premium-report-root .score-item:last-child{border-bottom:none;}
-    .premium-report-root .score-item-name{font-size:13px;color:var(--text);flex:1;padding-right:16px;}
-    .premium-report-root .score-item-sub{font-size:11px;color:var(--text-muted);display:block;margin-top:2px;}
-    .premium-report-root .score-badge{display: inline-flex; align-items: center; justify-content: center; height: 28px; padding:0 14px; border-radius:8px; font-size:12px; font-weight:600; color:#fff; white-space:nowrap; vertical-align: middle; line-height: 1;}
-    .premium-report-root .section-block{background:var(--bg-card);border-radius:16px;margin-bottom:24px;border:1px solid var(--border);overflow:hidden; page-break-inside: avoid;}
-    .premium-report-root .section-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:var(--bg-section);border-bottom:1px solid var(--border);}
-    .premium-report-root .section-title{font-size:15px;font-weight:600;color:var(--primary);}
-    .premium-report-root .section-title span{color:var(--text);}
-    .premium-report-root .section-content{display:grid;grid-template-columns:1fr;gap:24px;padding:24px;}
-    .premium-report-root .section-analysis h4{font-size:12px;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;}
-    .premium-report-root .section-analysis p{font-size:14px;color:var(--text-soft);line-height:1.6;margin-bottom:16px;}
-    .premium-report-root .section-reco{background:var(--primary-light);border-radius:8px;padding:12px 14px;border-left:3px solid var(--primary);}
-    .premium-report-root .section-reco h5{font-size:11px;color:var(--primary);text-transform:uppercase;margin-bottom:6px;}
-    .premium-report-root .section-reco p{font-size:13px;color:var(--text-soft);margin:0;}
-    .premium-report-root .rubriques-list{padding:0 24px 24px;}
-    .premium-report-root .rubrique-card{background:var(--bg-rubrique);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid var(--border);}
-    .premium-report-root .rubrique-card:last-child{margin-bottom:0;}
-    .premium-report-root .rubrique-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
-    .premium-report-root .rubrique-num{font-size:11px;color:var(--text-muted);margin-bottom:4px;}
-    .premium-report-root .rubrique-title{font-size:14px;font-weight:600;color:var(--primary);}
-    .premium-report-root .rubrique-subtitle{font-size:13px;color:var(--text-soft);margin-top:4px;}
-    .premium-report-root .rubrique-body{margin-top:12px;}
-    .premium-report-root .rubrique-analysis h5{font-size:11px;color:var(--primary);text-transform:uppercase;margin-bottom:6px;}
-    .premium-report-root .rubrique-analysis p{font-size:13px;color:var(--text-soft);margin-bottom:12px;}
-    .premium-report-root .report-footer{text-align:center;padding:24px; padding-bottom: 0px; margin-bottom: 0px; color:var(--text-muted);font-size:10px; opacity: 0.6;}
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap");
+    
+    .premium-report-root {
+        --primary: #03a39b;
+        --primary-light: #e0f4f3;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-700: #334155;
+        --slate-800: #1e293b;
+        --slate-900: #0f172a;
+        --emerald-500: #10b981;
+        --emerald-600: #059669;
+        --amber-500: #f59e0b;
+        --red-100: #fee2e2;
+        --red-700: #b91c1c;
+        --orange-100: #ffedd5;
+        --orange-700: #c2410c;
+        
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: white;
+        color: var(--slate-800);
+        line-height: 1.6;
+        padding: 60px 70px; 
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        position: relative;
+        box-sizing: border-box;
+    }
+
+    .premium-report-root * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Typography */
+    .premium-report-root h1 { font-size: 32px; font-weight: 700; color: var(--slate-900); margin-bottom: 8px; }
+    .premium-report-root h2 { font-size: 24px; font-weight: 700; color: var(--slate-900); margin-bottom: 32px; display: flex; align-items: center; gap: 16px; }
+    .premium-report-root h3 { font-size: 18px; font-weight: 700; color: var(--slate-900); margin-bottom: 12px; }
+    .premium-report-root p { font-size: 15px; color: var(--slate-600); }
+
+    /* Badges & Tags */
+    .premium-report-root .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 16px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: normal;
+        text-align: center;
+        min-width: 100px;
+        line-height: 1.2;
+    }
+
+    .premium-report-root .tag {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    /* Layout Utilities */
+    .premium-report-root .flex { display: flex; }
+    .premium-report-root .items-center { align-items: center; }
+    .premium-report-root .justify-between { justify-content: space-between; }
+    .premium-report-root .gap-2 { gap: 8px; }
+    .premium-report-root .gap-4 { gap: 16px; }
+    .premium-report-root .gap-6 { gap: 24px; }
+    .premium-report-root .mb-8 { margin-bottom: 32px; }
+    .premium-report-root .mb-12 { margin-bottom: 48px; }
+    .premium-report-root .mb-16 { margin-bottom: 64px; }
+    .premium-report-root .w-full { width: 100%; }
+    
+    /* Specific Components */
+    .premium-report-root .header {
+        border-bottom: 1px solid var(--slate-100);
+        padding-bottom: 32px;
+        margin-bottom: 48px;
+    }
+
+    .premium-report-root .score-main {
+        font-size: 48px;
+        font-weight: 900;
+        color: var(--primary);
+        line-height: 1;
+    }
+
+    .premium-report-root .score-sub {
+        font-size: 24px;
+        color: var(--slate-300);
+    }
+
+    .premium-report-root .section-number {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-light);
+        color: var(--primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .premium-report-root .card {
+        background: var(--slate-50);
+        border-radius: 16px;
+        padding: 32px;
+        border: 1px solid var(--slate-100);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .premium-report-root .white-card {
+        background: white;
+        border: 1px solid var(--slate-100);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* Progress Bars */
+    .premium-report-root .progress-container {
+        flex: 1;
+        height: 12px;
+        background: var(--slate-100);
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    .premium-report-root .progress-bar {
+        height: 100%;
+        border-radius: 9999px;
+    }
+
+    .premium-report-root .score-badge-small {
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 45px;
+    }
+
+    .premium-report-root footer {
+        text-align: center;
+        font-size: 12px;
+        color: var(--slate-400);
+        padding-top: 32px;
+        border-top: 1px solid var(--slate-100);
+        margin-top: 48px;
+    }
     `;
 
     // Filter out "Coordonnées" sections for the report
@@ -147,59 +268,60 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
         <div id="premium-report-content" className="premium-report-root" style={{
             width: '210mm',
             minHeight: '297mm',
-            padding: '48px 56px',
             backgroundColor: 'white',
-            fontFamily: 'Inter, sans-serif',
-            color: '#1e293b',
             position: 'relative'
         }}>
             <style>{styles}</style>
 
             {/* Header */}
-            <div className="flex justify-between items-start mb-12 border-b border-slate-100 pb-8">
+            <div className="header flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-[#0f172a] mb-2">Rapport de Diagnostic Pulse+</h1>
-                    <div className="text-slate-500 text-sm">
-                        <p>Préparé pour : <span className="font-semibold text-[#0f172a]">{report.meta.prenom} {report.meta.nom}</span></p>
+                    <h1>Rapport de Diagnostic Pulse+</h1>
+                    <div style={{ fontSize: '14px', color: 'var(--slate-500)' }}>
+                        <p>Préparé pour : <span style={{ fontWeight: 600, color: 'var(--slate-900)' }}>{report.meta.prenom} {report.meta.nom}</span></p>
                         <p>Date : {date || new Date().toLocaleDateString('fr-FR')}</p>
                     </div>
                 </div>
-                <div className="text-right">
-                    <div className="text-5xl font-black text-[#03a39b] mb-2">{report.scores.global_score?.toFixed(1)}<span className="text-2xl text-slate-300">/5</span></div>
-                    <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-white min-w-[100px]"
-                        style={{ backgroundColor: getScoreColor(report.scores.global_score, report.scores.global_niveau) }}>
+                <div style={{ textAlign: 'right' }}>
+                    <div className="score-main">{report.scores.global_score?.toFixed(1)}<span className="score-sub">/5</span></div>
+                    <div className="badge" style={{ backgroundColor: getScoreColor(report.scores.global_score, report.scores.global_niveau), color: 'white', marginTop: '8px' }}>
                         {report.scores.global_niveau}
                     </div>
                 </div>
             </div>
 
             {/* Synthesis */}
-            <div className="mb-12">
-                <h2 className="text-xl font-bold text-[#0f172a] mb-6 flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-sm">1</span>
+            <div className="mb-16">
+                <h2>
+                    <span className="section-number">1</span>
                     Synthèse Exécutive
                 </h2>
-                <div className="bg-slate-50 rounded-2xl p-8 mb-8 text-[15px] text-slate-600 leading-relaxed shadow-sm">
-                    {report.synthese.resume_global}
+                <div className="card">
+                    <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--slate-500)', marginBottom: '8px' }}>
+                        Synthèse générale
+                    </h3>
+                    <p style={{ fontSize: '16px', color: 'var(--slate-700)', lineHeight: 1.6 }}>
+                        {report.synthese.resume_global}
+                    </p>
                 </div>
             </div>
 
             {/* Scores List */}
             <div className="mb-16">
-                <h2 className="text-2xl font-bold text-[#0f172a] mb-8 flex items-center gap-4">
-                    <span className="w-10 h-10 rounded-xl bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-base">2</span>
+                <h2>
+                    <span className="section-number">2</span>
                     Détail des Scores
                 </h2>
-                <div className="space-y-4">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {filteredSections.map((sec, idx) => {
                         const color = getScoreColor(sec.score, sec.niveau);
                         return (
-                            <div key={idx} className="flex items-center gap-6 text-[15px]">
-                                <div className="w-1/3 font-medium text-slate-700">{sec.nom}</div>
-                                <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
-                                    <div className="h-full rounded-full" style={{ width: `${sec.score_pct}%`, backgroundColor: color }}></div>
+                            <div key={idx} className="flex items-center gap-6">
+                                <div style={{ width: '30%', fontWeight: 500, color: 'var(--slate-700)', fontSize: '15px' }}>{sec.nom}</div>
+                                <div className="progress-container">
+                                    <div className="progress-bar" style={{ width: `${sec.score_pct}%`, backgroundColor: color }}></div>
                                 </div>
-                                <div className="score-badge" style={{ backgroundColor: color }}>
+                                <div className="score-badge-small" style={{ backgroundColor: color }}>
                                     {sec.score_pct}%
                                 </div>
                             </div>
@@ -217,28 +339,31 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
 
                 return (
                     <div key={sec.id || idx} className="mb-16">
-                        <h2 className="text-2xl font-bold text-[#0f172a] mb-8 flex items-center gap-4">
-                            <span className="w-10 h-10 rounded-xl bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-base">{idx + 3}</span>
-                            {sec.nom}
-                            <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-white ml-auto"
-                                style={{ backgroundColor: sectionColor, minWidth: '100px' }}>
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 style={{ marginBottom: 0 }}>
+                                <span className="section-number">{idx + 3}</span>
+                                {sec.nom}
+                            </h2>
+                            <div className="badge" style={{ backgroundColor: sectionColor, color: 'white' }}>
                                 {sec.niveau}
-                            </span>
-                        </h2>
-                        <div className="bg-slate-50 rounded-2xl p-8 mb-8 text-[15px] text-slate-600 leading-relaxed shadow-sm">
-                            {analysisDetails.resume_section}
+                            </div>
                         </div>
 
-                        {/* RUBRIQUES (Themes) */}
-                        <div className="space-y-8">
+                        <div className="card" style={{ marginBottom: '24px' }}>
+                            <p style={{ fontSize: '15px', color: 'var(--slate-600)' }}>
+                                {analysisDetails.resume_section}
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                             {(analysisDetails.themes || []).map((theme, tIdx) => (
-                                <div key={tIdx} className="border border-slate-100 rounded-xl p-6 bg-white shadow-sm">
-                                    <h3 className="font-bold text-[#0f172a] mb-3 text-lg">{theme.titre}</h3>
-                                    <p className="text-[15px] text-slate-600 leading-relaxed mb-5">{theme.texte}</p>
+                                <div key={tIdx} className="white-card">
+                                    <h3 style={{ marginBottom: '0' }}>{theme.titre}</h3>
+                                    <p style={{ marginTop: '12px' }}>{theme.texte}</p>
                                     {theme.recommandations && theme.recommandations.length > 0 && (
-                                        <div className="bg-blue-50 border-l-4 border-blue-200 p-4 text-sm text-blue-800">
-                                            <h4 className="font-semibold mb-2">Recommandations :</h4>
-                                            <ul className="list-disc pl-5 space-y-1">
+                                        <div style={{ marginTop: '16px', padding: '16px', backgroundColor: 'var(--primary-light)', borderRadius: '8px', color: 'var(--primary)' }}>
+                                            <h4 style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Recommandations :</h4>
+                                            <ul style={{ paddingLeft: '20px', fontSize: '14px' }}>
                                                 {theme.recommandations.map((reco, rIdx) => (
                                                     <li key={rIdx}>{reco}</li>
                                                 ))}
@@ -254,29 +379,29 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
 
             {/* RECOMMENDATIONS SECTION */}
             <div className="mb-16">
-                <h2 className="text-2xl font-bold text-[#0f172a] mb-8 flex items-center gap-4">
-                    <span className="w-10 h-10 rounded-xl bg-[#e0f4f3] text-[#03a39b] flex items-center justify-center text-base">
+                <h2>
+                    <span className="section-number">
                         {(report.analyse_detaillee_par_sections || []).filter(sec => !report.scores?.sections?.find(s => s.id === sec.section_id)?.nom.toLowerCase().includes('coordonnées')).length + 3}
                     </span>
-                    Recommandations Générales & Plan d'Action
+                    Recommandations & Plan d'Action
                 </h2>
-                <div className="space-y-6">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     {(report.recommandations_et_plan_action || []).map((reco, idx) => (
-                        <div key={idx} className="border border-slate-100 rounded-xl p-6 bg-white shadow-sm">
-                            <div className="flex justify-between items-center mb-3">
-                                <h3 className="font-bold text-[#0f172a] text-lg">{reco.titre}</h3>
-                                <div className="flex items-center gap-3 text-xs font-medium text-slate-500">
-                                    <span className="px-3 py-1 rounded-full uppercase tracking-wider font-bold" style={getPriorityStyle(reco.priorite)}>Priorité: {reco.priorite}</span>
-                                    <span className="px-3 py-1 rounded-full uppercase tracking-wider font-bold" style={getHorizonStyle(reco.horizon)}>Horizon: {reco.horizon}</span>
+                        <div key={idx} className="white-card">
+                            <div className="flex justify-between items-start" style={{ marginBottom: '16px' }}>
+                                <h3 style={{ marginBottom: 0 }}>{reco.titre}</h3>
+                                <div className="flex gap-2">
+                                    <span className="tag" style={getPriorityStyle(reco.priorite)}>Priorité: {reco.priorite}</span>
+                                    <span className="tag" style={getHorizonStyle(reco.horizon)}>Horizon: {reco.horizon}</span>
                                 </div>
                             </div>
-                            <p className="text-[15px] text-slate-600 leading-relaxed">{reco.description}</p>
+                            <p>{reco.description}</p>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <footer className="text-center text-xs text-slate-400 pt-8 border-t border-slate-100">
+            <footer>
                 Rapport généré par Pulse Express • {date || new Date().toLocaleDateString('fr-FR')}
             </footer>
         </div>
