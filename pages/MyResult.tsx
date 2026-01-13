@@ -87,7 +87,7 @@ const getPriorityColor = (priorite: number): string => {
 };
 
 const HeaderCard = ({ report, scoreColor }: { report: DiagnosticReport, scoreColor: string }) => {
-    const scores = report.scores || {};
+    const scores = report.scores;
     return (
         <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-100 relative overflow-hidden">
             <div className="flex justify-between items-start mb-8">
@@ -99,10 +99,10 @@ const HeaderCard = ({ report, scoreColor }: { report: DiagnosticReport, scoreCol
                     </div>
                 </div>
                 <div className="text-right">
-                    <div className="text-5xl font-black mb-1" style={{ color: scoreColor }}>{scores.global_score?.toFixed(1)}<span className="text-2xl text-slate-300 font-normal">/5</span></div>
+                    <div className="text-5xl font-black mb-1" style={{ color: scoreColor }}>{scores?.global_score?.toFixed(1) || '-'}<span className="text-2xl text-slate-300 font-normal">/5</span></div>
                     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white`}
                         style={{ backgroundColor: scoreColor }}>
-                        {scores.global_niveau}
+                        {scores?.global_niveau || '-'}
                     </span>
                 </div>
             </div>
@@ -229,10 +229,14 @@ const MyResult: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                if (location.state?.resultData) {
+                // Handle data passed from DiagnosticProcessing (key: result or resultData)
+                const incomingData = location.state?.result || location.state?.resultData;
+
+                if (incomingData) {
                     console.log("Using result data from navigation state");
-                    setResultData(location.state.resultData);
-                    setIsEphemeral(!!location.state.ephemeral);
+                    setResultData(incomingData);
+                    // If we have state data, it's considered ephemeral unless we have a user session that matches
+                    setIsEphemeral(true);
                     setLoading(false);
                     return;
                 }
