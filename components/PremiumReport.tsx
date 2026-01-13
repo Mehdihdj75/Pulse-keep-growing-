@@ -138,27 +138,32 @@ const PremiumReport: React.FC<PremiumReportProps> = ({ report, date }) => {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 6px 16px;
+        padding: 8px 16px;
         border-radius: 9999px;
         font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        white-space: normal;
+        white-space: nowrap;
         text-align: center;
         min-width: 100px;
-        line-height: 1.2;
+        line-height: 1;
+        vertical-align: middle;
     }
 
     .premium-report-root .tag {
-        display: inline-block;
-        padding: 4px 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
         border-radius: 9999px;
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         white-space: nowrap;
+        line-height: 1;
+        vertical-align: middle;
     }
 
     /* Layout Utilities */
