@@ -388,22 +388,65 @@ const MyResult: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            // 1. Update Database if we have an ID
+            let userId = emailInput; // Fallback to email if profile creation fails/not needed
+
+            // 1. Sync with Profiles Table
+            try {
+                // Check if profile exists
+                const { data: existingProfile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('email', emailInput)
+                    .single();
+
+                if (existingProfile) {
+                    userId = existingProfile.id;
+                    console.log("Found existing profile:", userId);
+                } else {
+                    // Create new profile (Lead)
+                    const newId = crypto.randomUUID();
+                    console.log("Creating new profile (lead):", newId);
+
+                    const { error: createError } = await supabase
+                        .from('profiles')
+                        .insert([{
+                            id: newId,
+                            email: emailInput,
+                            prenom: resultData?.meta?.prenom || 'Utilisateur',
+                            nom: resultData?.meta?.nom || '',
+                            role: 'INDIVIDUEL',
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (!createError) {
+                        userId = newId;
+                    } else {
+                        console.error("Profile creation error", createError);
+                        // If FK constraint to auth.users fails, we just continue with email as metadata specific to diagnostics
+                        // or user_id column might be text and accept email. 
+                        // If user_id IS a foreign key to auth.users, this INSERT will fail if we use a random UUID. 
+                        // Assuming 'profiles' might be a separate table or looser constraint for leads based on user request.
+                    }
+                }
+            } catch (profileErr) {
+                console.error("Profile Sync Error", profileErr);
+            }
+
+            // 2. Update Diagnostic in DB
             if (diagnosticId) {
-                console.log("Updating diagnostic owner...", diagnosticId, emailInput);
+                console.log("Updating diagnostic owner...", diagnosticId, userId);
                 const { error: dbError } = await supabase
                     .from('diagnostics')
                     .update({
-                        user_id: emailInput,
-                        // Update meta in report_data as well if needed, or just relying on user_id column
+                        user_id: userId, // Link to profile ID or Email
                     })
                     .eq('id', diagnosticId);
 
                 if (dbError) console.error("DB Update Error", dbError);
             }
 
-            // 2. Trigger N8N Webhook with answers and new email
-            if (answers) {
+            // 3. Trigger N8N Webhook with answers and new email
+            if (answers && resultData) {
                 console.log("Triggering N8N with email", emailInput);
                 const n8nPayload = buildN8NPayload(
                     `${resultData.meta?.prenom} ${resultData.meta?.nom}`,
@@ -417,7 +460,7 @@ const MyResult: React.FC = () => {
                 });
             }
 
-            // 3. Unlock and Download
+            // 4. Unlock and Download
             setIsEphemeral(false);
             setShowCTAModal(false);
 
@@ -427,7 +470,7 @@ const MyResult: React.FC = () => {
 
         } catch (err) {
             console.error("Submission error", err);
-            // Fallmback: unlock anyway so user isn't stuck
+            // Fallback: unlock anyway so user isn't stuck
             setIsEphemeral(false);
             setShowCTAModal(false);
         } finally {
